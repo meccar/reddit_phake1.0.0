@@ -1,0 +1,10 @@
+go 1.21.6
+
+use (
+	.
+	./api
+	./db/sqlc
+	./token
+	./util
+	./web
+)

@@ -1,0 +1,27 @@
+<!-- form.html -->
+
+{{define "form"}}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Form Submission</title>
+</head>
+<body>
+    <h1>Form Submission</h1>
+    <p>This page is for receiving JSON data submitted via a form.</p>
+    <pre id="json-data"></pre>
+
+    <script>
+        // Function to fetch and display JSON data
+        async function fetchFormData() {
+            const response = await fetch('/api/v1/form');
+            const data = await response.json();
+            document.getElementById('json-data').textContent = JSON.stringify(data, null, 2);
+        }
+
+        // Call the function when the page loads
+        window.onload = fetchFormData;
+    </script>
+</body>
+</html>
+{{end}}

@@ -1,0 +1,21 @@
+{{define "admin_body"}}
+<h1>Welcome Admin</h1>
+
+<form action="/api/v1/post" method="post">
+    <label for="title">Tiêu đề:</label><br>
+    <input type="text" id="title" name="title"><br>
+
+    <label for="article">Nội Dung:</label><br>
+    <textarea id="article" name="article"></textarea><br>
+
+    <label for="picture">Ảnh:</label><br>
+    <input type="file" id="picture" name="picture" accept="image/*"><br>
+
+    <button type="submit">Đăng</button>
+</form>
+
+<!-- Logout Button -->
+<form action="/api/v1/logout" method="post">
+    <button type="submit">Logout</button>
+</form>
+{{end}}
