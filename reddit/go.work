@@ -1,0 +1,14 @@
+go 1.21.6
+
+use (
+	.
+	./api
+	./db/sqlc
+	./error
+	./mail
+	./service
+	./token
+	./util
+	./web
+	./worker
+)
