@@ -1,10 +1,10 @@
-DB_URL=postgresql://postgres:secret@localhost:5432/postgres?sslmode=disable
+DB_URL=postgresql://root:1@localhost:5432/postgres?sslmode=disable
 
 network:
 	docker network create tafviet-network
 
 postgres:
-	docker run --name postgres --network tafviet-network -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -d postgres:14-alpine
+	docker run --name postgres --network tafviet-network -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=1 -d postgres:16.2
 
 mysql:
 	docker run --name mysql8 -p 3306:3306  -e MYSQL_ROOT_PASSWORD=secret -d mysql:8
