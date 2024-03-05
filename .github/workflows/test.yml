@@ -21,8 +21,8 @@ jobs:
         image: postgres:16.2
         # Provide the password for postgres
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: secret
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: 1
           POSTGRES_DB: postgres
         ports:
           # Maps tcp port 5050 on service container to the host
