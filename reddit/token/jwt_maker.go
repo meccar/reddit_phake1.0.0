@@ -84,6 +84,11 @@ func (t *JWTAuth) MakeToken(id, username, role string) (string, error) {
 	SetIssuedNow(claims)
 	SetExpiryIn(claims, 1*time.Minute)
 
+	// claims, err := NewPayload(username, role, 1*time.Minute)
+	// if err != nil {
+	// 	return "", claims, err
+	// }
+
 	// Encode the claims into a JWT token string
 	_, tokenString, err := TokenAuthRS256.Encode(claims)
 
