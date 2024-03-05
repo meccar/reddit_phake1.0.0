@@ -66,7 +66,7 @@ func Send(mailer *GmailSender, receiver, secret_code string) {
 	// Define email details
 	subject := "Welcome to TAF Viet"
 	// content := "This is a test email content."
-	verifyUrl := fmt.Sprintf("http://sfxzyp-1515.csb.app/api/v1/verify_email?email=%s&secret_code=%s",
+	verifyUrl := fmt.Sprintf("http://lxpf8d-1515.csb.app/api/v1/verify_email?email=%s&secret_code=%s",
 	receiver, secret_code)
 	content := fmt.Sprintf(`
 	Thank you for registering with us!<br/>
