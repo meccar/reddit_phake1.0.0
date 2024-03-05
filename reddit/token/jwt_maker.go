@@ -76,21 +76,30 @@ func init() {
 
 func (t *JWTAuth) MakeToken(id, username, role string) (string, error) {
 	// Define the claims for the JWT token
-	claims := map[string]interface{}{
-		"id":       id,
-		"username": username,
-		"role":     role,
-	}
-	SetIssuedNow(claims)
-	SetExpiryIn(claims, 1*time.Minute)
-
-	// claims, err := NewPayload(username, role, 1*time.Minute)
-	// if err != nil {
-	// 	return "", claims, err
+	// claims := map[string]interface{}{
+	// 	"id":       id,
+	// 	"username": username,
+	// 	"role":     role,
 	// }
+	// SetIssuedNow(claims)
+	// SetExpiryIn(claims, 1*time.Minute)
+
+	claims, err := NewPayload(username, role, 1*time.Minute)
+	if err != nil {
+		return "", err
+	}
+
+	// Convert *Payload to map[string]interface{}
+	claimsMap := map[string]interface{}{
+	    "ID":        claims.ID,
+	    "Username":  claims.Username,
+	    "Role":      claims.Role,
+	    "IssuedAt":  claims.IssuedAt,
+	    "ExpiredAt": claims.ExpiredAt,
+	}
 
 	// Encode the claims into a JWT token string
-	_, tokenString, err := TokenAuthRS256.Encode(claims)
+	_, tokenString, err := TokenAuthRS256.Encode(claimsMap)
 
 	// Check for errors during encoding
 	if err != nil {
