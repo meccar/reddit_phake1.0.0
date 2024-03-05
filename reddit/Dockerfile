@@ -25,9 +25,10 @@ WORKDIR /go_project3
 COPY --from=builder /go_project3/main .
 COPY app.env .
 # COPY start.sh .
+COPY templates ./templates
 COPY wait-for.sh .
 COPY db/migration ./db/migration
 
 EXPOSE 1515 5432
-CMD [ "/go_project3/main" ]
+CMD [ "/reddit/main" ]
 # ENTRYPOINT [ "/go_project3/start.sh" ]
