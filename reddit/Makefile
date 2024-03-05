@@ -1,4 +1,4 @@
-DB_URL=postgresql://postgres:1@localhost:5432/postgres?sslmode=disable
+DB_URL=postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable
 
 network:
 	docker network create tafviet-network
