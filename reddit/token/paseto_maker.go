@@ -25,15 +25,28 @@ func CreateToken(username string, role string, duration time.Duration, w http.Re
 	token.SetString("role", payload.Role)
 
 	secretKey := paseto.NewV4AsymmetricSecretKey()
-	fmt.Println("secretKey: ",secretKey)
+	fmt.Println("\n secretKey: ",secretKey)
 
 	publicKey := secretKey.Public() 
-	fmt.Println("publicKey: ",publicKey)
+	fmt.Println("\n publicKey: ",publicKey)
 
 	signed := token.V4Sign(secretKey, nil)
-	fmt.Println("signed: ",signed)
+	fmt.Println("\n signed: ",signed)
 
 	SetPasetoCookie(w, signed, role, int(1*time.Minute.Seconds()))
+
+	parser := paseto.NewParserWithoutExpiryCheck()
+
+	parsetoken, err := parser.ParseV4Public(publicKey, signed, nil)
+	if err != nil {
+		log.Error().Err(err)
+		return err
+	}
+	fmt.Println("\n parsetoken: ",parsetoken)
+	fmt.Println("\n string(token.ClaimsJSON()): ",string(token.ClaimsJSON()))
+	fmt.Println("\n string(token.Footer()): ",string(token.Footer()))
+
+
 	return err
 }
 
