@@ -50,19 +50,12 @@ func (server *Server) loginHandler(c *gin.Context) {
 		return
 	}
 
-	// Create a token with payload and sign it
+	// Generate and sign the Paseto token
 	err = tokens.CreateToken(msg.Username, role, duration, c.Writer)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-
-	// Print the signed token and payload (for debugging purposes)
-	// fmt.Println(signed)
-	// fmt.Println(payload)
-
-	// Set the JWT token as a cookie in the response
-	// server.TokenAuthRS256.SetJWTCookie(c.Writer, token, role, int(duration.Seconds()))
 
 	// Create a session for the user
 	msg.Session, err = server.DbHandler.CreateSession(c.Request.Context(), msg.Username, role)

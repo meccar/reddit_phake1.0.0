@@ -29,6 +29,7 @@ func (server *Server) SetupRoutes() {
 	authRoutes.Use(
 		jwtauth.Verifier(server.TokenAuthRS256),
 		jwtauth.Authenticator(server.TokenAuthRS256),
+		// jwtauth.VerifyPaseto(*http.Request),
 		roleMiddleware(),
 	)
 	{
