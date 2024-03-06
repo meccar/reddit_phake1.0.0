@@ -9,11 +9,11 @@ import (
 	"aidanwoods.dev/go-paseto"
 )
 
-func CreateToken(username string, role string, duration time.Duration, w http.ResponseWriter) {
+func CreateToken(username string, role string, duration time.Duration, w http.ResponseWriter) error {
 	payload, err := NewPayload(username, role, duration)
 	if err != nil {
 		log.Error().Err(err)
-		return 
+		return err
 	}
 	token := paseto.NewToken()
 	
@@ -27,7 +27,7 @@ func CreateToken(username string, role string, duration time.Duration, w http.Re
 	signed := token.V4Sign(secretKey, nil)
 
 	SetPasetoCookie(w, signed, role, int(1*time.Minute.Seconds()))
-	// return signed, payload, err
+	return err
 }
 
 func SetPasetoCookie(w http.ResponseWriter, token, role string, duration int) {

@@ -43,21 +43,19 @@ func (server *Server) loginHandler(c *gin.Context) {
 	msg.ID, _ = uuid.Parse(server.DbHandler.GetID(c.Request.Context(), msg))
 	role := server.DbHandler.GetRole(c.Request.Context(), msg)
 
-	server.TokenAuthRS256.MakeToken((msg.ID).String(), msg.Username, role, c.Writer)
 	// Generate and sign the JWT token
-	// token, err := server.TokenAuthRS256.MakeToken((msg.ID).String(), msg.Username, role, c.Writer)
-	// if err != nil {
-		// c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
-		// return
-	// }
+	err = server.TokenAuthRS256.MakeToken((msg.ID).String(), msg.Username, role, c.Writer)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
-	tokens.CreateToken(msg.Username, role, duration, c.Writer)
 	// Create a token with payload and sign it
-	// signed, payload, err := tokens.CreateToken(msg.Username, role, duration)
-	// if err != nil {
-		// c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
-		// return
-	// }
+	err = tokens.CreateToken(msg.Username, role, duration, c.Writer)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
 	// Print the signed token and payload (for debugging purposes)
 	// fmt.Println(signed)
