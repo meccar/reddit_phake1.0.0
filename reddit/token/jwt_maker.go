@@ -74,7 +74,7 @@ func init() {
 	// Initialize a JWTAuth object with the HSA key
 }
 
-func (t *JWTAuth) MakeToken(id, username, role string) (string, error) {
+func (t *JWTAuth) MakeToken(id, username, role string, w http.ResponseWriter) {
 	// Define the claims for the JWT token
 	// claims := map[string]interface{}{
 	// 	"id":       id,
@@ -86,7 +86,7 @@ func (t *JWTAuth) MakeToken(id, username, role string) (string, error) {
 
 	claims, err := NewPayload(username, role, 1*time.Minute)
 	if err != nil {
-		return "", err
+		return 
 	}
 
 	// Convert *Payload to map[string]interface{}
@@ -104,11 +104,15 @@ func (t *JWTAuth) MakeToken(id, username, role string) (string, error) {
 	// Check for errors during encoding
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to encode claims")
-		return "", err
+		return 
 	}
 
 	// Return the JWT token string
-	return tokenString, nil
+	t.SetJWTCookie(w, tokenString, role, int(1*time.Minute.Seconds()))
+
+	w.Header().Set("Authorization", "Bearer "+tokenString)
+
+	// return tokenString, nil
 }
 
 func (t *JWTAuth) SetJWTCookie(w http.ResponseWriter, token, role string, duration int) {
