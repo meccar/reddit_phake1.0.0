@@ -42,7 +42,7 @@ func CreateToken(username string, role string, duration time.Duration, w http.Re
 		log.Error().Err(err)
 		return err
 	}
-	// fmt.Println("\n parsetoken: ",parsetoken)
+	fmt.Println("\n parsetoken: ", parsetoken)
 	fmt.Println("\n string(token.ClaimsJSON()): ", string(token.ClaimsJSON()))
 	fmt.Println("\n string(token.Footer()): ", string(token.Footer()))
 
