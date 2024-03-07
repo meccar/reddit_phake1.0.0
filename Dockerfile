@@ -30,8 +30,8 @@ COPY db/migration ./db/migration
 
 EXPOSE 1515 5432
 CMD [ "/reddit_phake/main" ]
-<<<<<<< HEAD:Dockerfile
+# <<<<<<< HEAD:Dockerfile
 # ENTRYPOINT [ "/go_project3/start.sh" ]
-=======
+# =======
 # ENTRYPOINT [ "/reddit_phake/start.sh" ]
->>>>>>> 0b2fd6894a84aac6f6ad17752c67b3d32f47a137:reddit/Dockerfile
+# >>>>>>> 0b2fd6894a84aac6f6ad17752c67b3d32f47a137:reddit/Dockerfile
