@@ -2,11 +2,11 @@ package token
 
 import (
 	"fmt"
-	"time"
 	"net/http"
+	"time"
 
-	"github.com/rs/zerolog/log"
 	"aidanwoods.dev/go-paseto"
+	"github.com/rs/zerolog/log"
 )
 
 func CreateToken(username string, role string, duration time.Duration, w http.ResponseWriter) error {
@@ -25,13 +25,13 @@ func CreateToken(username string, role string, duration time.Duration, w http.Re
 	token.SetString("role", payload.Role)
 
 	secretKey := paseto.NewV4AsymmetricSecretKey()
-	fmt.Println("\n secretKey: ",secretKey)
+	fmt.Println("\n secretKey: ", secretKey)
 
-	publicKey := secretKey.Public() 
-	fmt.Println("\n publicKey: ",publicKey)
+	publicKey := secretKey.Public()
+	fmt.Println("\n publicKey: ", publicKey)
 
 	signed := token.V4Sign(secretKey, nil)
-	fmt.Println("\n signed: ",signed)
+	fmt.Println("\n signed: ", signed)
 
 	SetPasetoCookie(w, signed, role, int(1*time.Minute.Seconds()))
 
@@ -42,10 +42,9 @@ func CreateToken(username string, role string, duration time.Duration, w http.Re
 		log.Error().Err(err)
 		return err
 	}
-	fmt.Println("\n parsetoken: ",parsetoken)
-	fmt.Println("\n string(token.ClaimsJSON()): ",string(token.ClaimsJSON()))
-	fmt.Println("\n string(token.Footer()): ",string(token.Footer()))
-
+	fmt.Println("\n parsetoken: ", parsetoken)
+	fmt.Println("\n string(token.ClaimsJSON()): ", string(token.ClaimsJSON()))
+	fmt.Println("\n string(token.Footer()): ", string(token.Footer()))
 
 	return err
 }
@@ -60,7 +59,7 @@ func SetPasetoCookie(w http.ResponseWriter, token, role string, duration int) {
 		// Uncomment below for HTTPS:
 		// Secure: true,
 		Value: token,
-		Path: "/",
+		Path:  "/",
 	})
 }
 
@@ -76,17 +75,16 @@ func pasetoFromCookie(r *http.Request) string {
 // func VerifyPaseto(r *http.Request) {
 //   	signed := pasetoFromCookie(r)
 // 	fmt.Println("signed: ",signed)
-	
-	// parser := paseto.NewParser()
 
+// parser := paseto.NewParser()
 
-	// token, err := parser.ParseV4Public(publicKey, signed, nil)
-	// fmt.Println("token: ",token)
+// token, err := parser.ParseV4Public(publicKey, signed, nil)
+// fmt.Println("token: ",token)
 
-	// if err != nil {
-	// 	log.Error().Err(err)
-	// 	return 
-	// }
+// if err != nil {
+// 	log.Error().Err(err)
+// 	return
+// }
 // }
 
 // publicKey, err := paseto.NewV4AsymmetricPublicKeyFromHex("1eb9dbbbbc047c03fd70604e0071f0987e16b28b757225c11f00415d0e20b1a2") // this wil fail if given key in an invalid format

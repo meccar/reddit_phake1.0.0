@@ -1,5 +1,4 @@
-# # Use the official Golang image as the base image
-# FROM golang:latest
+
 
 # # Set the working directory inside the container
 # WORKDIR /go_project3
@@ -31,4 +30,8 @@ COPY db/migration ./db/migration
 
 EXPOSE 1515 5432
 CMD [ "/reddit_phake/main" ]
+<<<<<<< HEAD:Dockerfile
 # ENTRYPOINT [ "/go_project3/start.sh" ]
+=======
+# ENTRYPOINT [ "/reddit_phake/start.sh" ]
+>>>>>>> 0b2fd6894a84aac6f6ad17752c67b3d32f47a137:reddit/Dockerfile
