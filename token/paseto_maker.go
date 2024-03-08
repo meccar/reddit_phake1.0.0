@@ -11,6 +11,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/vk-rv/pvx"
+	"github.com/gin-gonic/gin"
 )
 // "encoding/hex"
 
@@ -121,7 +122,7 @@ func (c *MyClaims) Valid() error {
 	
 }
 
-func CreateToken(username string, role string, duration time.Duration, w http.ResponseWriter) error {
+func CreateToken(username string, role string, duration time.Duration, c *gin.Context) error {
 	config, err := util.LoadConfig(".")
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot load config")
@@ -157,19 +158,15 @@ func CreateToken(username string, role string, duration time.Duration, w http.Re
 	}
 	fmt.Println("\n <<< after Sign token: ", token)
 
-	if err := pv4.Verify(token, pk, pvx.WithAssert([]byte("test"))).ScanClaims(claims); err != nil {
-		errors.Errorf("can't verify paseto token, err is %v", err.Err())
-	}
-	if tk.HasFooter() {
-		errors.Errorf("footer was not passed to the library")
-	}
 
-	SetPasetoCookie(w, token, role, int(duration.Seconds()))
+
+	c.Set("publicKey", publicKey)
+	SetPasetoCookie(c, token, role, int(duration.Seconds()))
 	return err
 }
 
-func SetPasetoCookie(w http.ResponseWriter, token, role string, duration int) {
-	http.SetCookie(w, &http.Cookie{
+func SetPasetoCookie(c *gin.Context, token, role string, duration int) {
+	http.SetCookie(c.Writer, &http.Cookie{
 		Name:     "paseto",
 		HttpOnly: true,
 		MaxAge:   duration,
@@ -190,21 +187,55 @@ func pasetoFromCookie(r *http.Request) string {
 	return cookie.Value
 }
 
-// VerifyToken checks if the token is valid or not
-// func VerifyPaseto(r *http.Request) {
-//   	signed := pasetoFromCookie(r)
+// // VerifyToken checks if the token is valid or not
+// func VerifyPaseto(c *gin.Context) {
+//   	signed := pasetoFromCookie(c.Request)
 // 	fmt.Println("signed: ",signed)
 
-// parser := paseto.NewParser()
+// 	publicKey, exists := c.Get("publicKey")
+//     if !exists {
+//         // Handle case where public key is not found
+//         c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Public key not found"})
+//         return
+//     }
 
-// token, err := parser.ParseV4Public(publicKey, signed, nil)
-// fmt.Println("token: ",token)
+// 	if err := pv4.Verify(token, pk, pvx.WithAssert([]byte("test"))).ScanClaims(claims); err != nil {
+// 		errors.Errorf("can't verify paseto token, err is %v", err.Err())
+// 	}
+// 	if tk.HasFooter() {
+// 		errors.Errorf("footer was not passed to the library")
+// 	}
 
-// if err != nil {
-// 	log.Error().Err(err)
-// 	return
+// 	c.Next()
+
 // }
-// }
+
+func VerifyPaseto(pv4 *pvx.ProtoV4Public) gin.HandlerFunc  {
+    return func(c *gin.Context) {
+        token := pasetoFromCookie(c.Request)
+        if token == "" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+            return
+        }
+        
+        // Get the public key from the request context
+        publicKey := c.Request.Context().Value("publicKey").(*pvx.AsymPublicKey)
+        
+        // Verify the token
+        if err := pv4.Verify(token, publicKey, pvx.WithAssert([]byte("test"))).Err(); err != nil {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Forbidden"})
+            return
+        }
+		// if tk.HasFooter() {
+		// 	c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Token not founded in footer"})
+		// 	return
+		// }
+
+        // If token is valid, call the next handler
+		c.Next()
+
+    }
+}
 
 // publicKey, err := paseto.NewV4AsymmetricPublicKeyFromHex("1eb9dbbbbc047c03fd70604e0071f0987e16b28b757225c11f00415d0e20b1a2") // this wil fail if given key in an invalid format
 // signed := "v4.public.eyJkYXRhIjoidGhpcyBpcyBhIHNpZ25lZCBtZXNzYWdlIiwiZXhwIjoiMjAyMi0wMS0wMVQwMDowMDowMCswMDowMCJ9v3Jt8mx_TdM2ceTGoqwrh4yDFn0XsHvvV_D0DtwQxVrJEBMl0F2caAdgnpKlt4p7xBnx1HcO-SPo8FPp214HDw.eyJraWQiOiJ6VmhNaVBCUDlmUmYyc25FY1Q3Z0ZUaW9lQTlDT2NOeTlEZmdMMVc2MGhhTiJ9"

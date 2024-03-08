@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/vk-rv/pvx"
 	"github.com/rs/zerolog/log"
 	"github.com/gin-gonic/gin"
 	db "sqlc"
@@ -32,6 +33,7 @@ type Server struct {
 	Router         *gin.Engine
 	DbHandler      *db.Handlers
 	TokenAuthRS256 *jwtauth.JWTAuth
+	Pv4 *pvx.ProtoV4Public
 }
 
 func CreateServer(Config util.Config, dbHandler *db.Handlers) (*Server, error) {
@@ -40,6 +42,7 @@ func CreateServer(Config util.Config, dbHandler *db.Handlers) (*Server, error) {
 		Router:         gin.Default(),
 		DbHandler:      dbHandler,
 		TokenAuthRS256: jwtauth.TokenAuthRS256,
+		Pv4: pvx.NewPV4Public(),
 	}
 
 	server.MountMiddleware()

@@ -51,7 +51,7 @@ func (server *Server) loginHandler(c *gin.Context) {
 	}
 
 	// Generate and sign the Paseto token
-	err = tokens.CreateToken(msg.Username, role, duration, c.Writer)
+	err = tokens.CreateToken(msg.Username, role, duration, c)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 		return
