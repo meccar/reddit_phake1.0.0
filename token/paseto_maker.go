@@ -3,49 +3,168 @@ package token
 import (
 	"fmt"
 	"net/http"
+	"errors"
 	"time"
+	"crypto/ed25519"
 
-	"aidanwoods.dev/go-paseto"
+	util "util"
+
 	"github.com/rs/zerolog/log"
+	"github.com/vk-rv/pvx"
 )
+// "encoding/hex"
+
+// "aidanwoods.dev/go-paseto"
+
+// func CreateToken(username string, role string, duration time.Duration, w http.ResponseWriter) error {
+
+// 	payload, err := NewPayload(username, role, duration)
+// 	if err != nil {
+// 		log.Error().Err(err)
+// 		return err
+// 	}
+// 	token := paseto.NewToken()
+// 	token.SetAudience("audience")
+// 	token.SetJti("identifier")
+// 	token.SetIssuer("issuer")
+// 	token.SetSubject("subject")
+// 	token.SetString("username", payload.Username)
+// 	token.SetString("role", payload.Role)
+
+// 	secretKey := paseto.NewV4AsymmetricSecretKey()
+// 	fmt.Println("\n secretKey: ", secretKey)
+
+// 	publicKey := secretKey.Public()
+// 	fmt.Println("\n publicKey: ", publicKey)
+
+// 	signed := token.V4Sign(secretKey, nil)
+// 	fmt.Println("\n signed: ", signed)
+
+// 	SetPasetoCookie(w, signed, role, int(1*time.Minute.Seconds()))
+
+// 	parser := paseto.NewParserWithoutExpiryCheck()
+
+// 	parsetoken, err := parser.ParseV4Public(publicKey, signed, nil)
+// 	if err != nil {
+// 		log.Error().Err(err)
+// 		return err
+// 	}
+// 	fmt.Println("\n parsetoken: ", parsetoken)
+// 	fmt.Println("\n string(token.ClaimsJSON()): ", string(token.ClaimsJSON()))
+// 	fmt.Println("\n string(token.Footer()): ", string(token.Footer()))
+
+// 	return err
+// }
+
+
+// k, err := hex.DecodeString(TokenSecret)
+// if err != nil {
+	// return err 
+// }
+// fmt.Println("\n k: ", k)
+// 
+// symK := pvx.NewSymmetricKey(k, pvx.Version4)
+// fmt.Println("\n symK: ", symK)
+// 
+// pv4 := pvx.NewPV4Local()
+// fmt.Println("\n pv4: ", pv4)
+
+// token, err := pv4.Encrypt(symK, claims, pvx.WithAssert([]byte("test")))
+// if err != nil {
+	// return err
+// }
+// fmt.Println("\n <<< after Encrypt 1 token: ", token)
+// 
+// cc := MyClaims{}
+// 
+// err = pv4.
+	// Decrypt(token, symK, pvx.WithAssert([]byte("test"))).
+	// ScanClaims(&cc)
+// if err != nil {
+	// return err 
+// }
+// work with cc claims ...
+// 
+// or without assert
+// token, err := pv4.Encrypt(symK, claims)
+// if err != nil {
+	// return err
+// }
+// fmt.Println("\n <<< after Encrypt 2 token: ", token)
+// 
+// err = pv4.Decrypt(token, symK).ScanClaims(&cc)
+
+type AdditionalClaims struct {
+	Username  string    `json:"username"`
+	Role      string    `json:"role"`
+	Date time.Time `json:"date"`
+}
+
+type MyClaims struct {
+	RegisteredClaims pvx.RegisteredClaims
+	AdditionalClaims
+} 
+
+func (c *MyClaims) Valid() error {
+
+	validationErr := &pvx.ValidationError{}
+	
+	// first, check the validity of registered claims
+	if err := c.RegisteredClaims.Valid(); err != nil {
+		errors.As(err, &validationErr)
+	}
+	
+	//  then, perform custom validation
+	
+	
+	return nil 
+	
+}
 
 func CreateToken(username string, role string, duration time.Duration, w http.ResponseWriter) error {
-
-	payload, err := NewPayload(username, role, duration)
+	config, err := util.LoadConfig(".")
 	if err != nil {
-		log.Error().Err(err)
-		return err
+		log.Fatal().Err(err).Msg("cannot load config")
 	}
-	token := paseto.NewToken()
-	token.SetAudience("audience")
-	token.SetJti("identifier")
-	token.SetIssuer("issuer")
-	token.SetSubject("subject")
-	token.SetString("username", payload.Username)
-	token.SetString("role", payload.Role)
 
-	secretKey := paseto.NewV4AsymmetricSecretKey()
-	fmt.Println("\n secretKey: ", secretKey)
+	TokenSecret = config.TokenSymmetricKey
+	now := time.Now()
+	claims := &MyClaims{
+		RegisteredClaims: pvx.RegisteredClaims{
+			IssuedAt:   pvx.TimePtr(now.Add(time.Minute * 60)),
+			NotBefore:  pvx.TimePtr(now.Add(time.Minute * 60)),
+			Expiration: pvx.TimePtr(now.AddDate(0, 0, -1)),
+		},
+		AdditionalClaims: AdditionalClaims{Username: username, Role: role, Date: time.Now().Add(time.Minute * 60)},
+	}
 
-	publicKey := secretKey.Public()
+	pv4 := pvx.NewPV4Public()
+
+	publicKey, privateKey, _ := ed25519.GenerateKey(nil)
 	fmt.Println("\n publicKey: ", publicKey)
+	fmt.Println("\n privateKey: ", privateKey)
 
-	signed := token.V4Sign(secretKey, nil)
-	fmt.Println("\n signed: ", signed)
+	sk := pvx.NewAsymmetricSecretKey(privateKey, pvx.Version4)
+	fmt.Println("\n sk: ", sk)
 
-	SetPasetoCookie(w, signed, role, int(1*time.Minute.Seconds()))
+	pk := pvx.NewAsymmetricPublicKey(publicKey, pvx.Version4)
+	fmt.Println("\n pk: ", pk)
 
-	parser := paseto.NewParserWithoutExpiryCheck()
 
-	parsetoken, err := parser.ParseV4Public(publicKey, signed, nil)
+	token, err := pv4.Sign(sk, claims, pvx.WithAssert([]byte("test")))
 	if err != nil {
-		log.Error().Err(err)
-		return err
+		log.Fatal().Err(err)
 	}
-	fmt.Println("\n parsetoken: ", parsetoken)
-	fmt.Println("\n string(token.ClaimsJSON()): ", string(token.ClaimsJSON()))
-	fmt.Println("\n string(token.Footer()): ", string(token.Footer()))
+	fmt.Println("\n <<< after Sign token: ", token)
 
+	if err := pv4.Verify(token, pk, pvx.WithAssert([]byte("test"))).ScanClaims(claims); err != nil {
+		errors.Errorf("can't verify paseto token, err is %v", err.Err())
+	}
+	if tk.HasFooter() {
+		errors.Errorf("footer was not passed to the library")
+	}
+
+	SetPasetoCookie(w, token, role, int(duration.Seconds()))
 	return err
 }
 
