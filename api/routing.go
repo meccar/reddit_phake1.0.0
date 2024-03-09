@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"fmt"
 
 	jwtauth "token"
 
@@ -27,11 +28,26 @@ func (server *Server) SetupRoutes() {
 	// Route grouping for authenticated routes
 	authRoutes := server.Router.Group("/")
 	authRoutes.Use(
+		func(c *gin.Context) {
+			fmt.Println("Entering Verifier middleware")
+		},
+
 		jwtauth.Verifier(server.TokenAuthRS256),
+		func(c *gin.Context) {
+			fmt.Println("<<< After Verifier")
+		},
+
 		jwtauth.Authenticator(server.TokenAuthRS256),
+	    func(c *gin.Context) {
+			fmt.Println("<<< After Authenticator")
+		},
+
 		// jwtauth.VerifyPaseto(server.Pv4),
 		// jwtauth.VerifyPaseto(*http.Request),
 		roleMiddleware(),
+		func(c *gin.Context) {
+			fmt.Println("<<< After roleMiddleware")
+		},
 	)
 	{
 		authRoutes.GET("/:role/:token", UserHandler)
