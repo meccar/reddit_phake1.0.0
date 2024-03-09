@@ -66,6 +66,7 @@ func roleMiddleware() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
+		fmt.Println("<<< After tokenClaims ", tokenClaims)
 
 		// Check allowed paths based on role
 		if tokenClaims["role"].(string) == "admin" && !strings.HasPrefix(c.Request.URL.Path, "/admin/") {
@@ -76,6 +77,7 @@ func roleMiddleware() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusForbidden, errorResponse(fmt.Errorf("Access Forbidden")))
 			return
 		}
+		fmt.Println("<<< After Check allowed paths")
 
 		// Continue processing the request
 		c.Next()
