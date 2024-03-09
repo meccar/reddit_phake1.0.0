@@ -20,13 +20,13 @@ func UserHandler(c *gin.Context) {
 		return
 	}
 
-	if tokenClaims["role"].(string) == "admin" {
+	if tokenClaims["Role"].(string) == "admin" {
 		// web.Render(c.Writer, "admin", nil)
 		c.HTML(http.StatusOK, "admin", nil)
-	} else if tokenClaims["role"].(string) == "user" {
+	} else if tokenClaims["Role"].(string) == "user" {
 		// web.Render(c.Writer, "user", nil)
 		c.HTML(http.StatusOK, "user", nil)
 	} else {
-		c.AbortWithStatusJSON(http.StatusForbidden, errorResponse(fmt.Errorf("Access Forbidden")))
+		c.JSON(http.StatusForbidden, errorResponse(fmt.Errorf("Access Forbidden")))
 	}
 }

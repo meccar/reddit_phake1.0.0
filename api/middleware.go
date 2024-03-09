@@ -66,24 +66,24 @@ func roleMiddleware() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
-		fmt.Println("<<< After tokenClaims ", tokenClaims)
-		fmt.Println("<<< tokenClaims['role'].(string) ", tokenClaims["role"].(string))
-		fmt.Println("<<< URL admin? ", strings.HasPrefix(c.Request.URL.Path, "/admin/"))
-		fmt.Println("<<< URL user? ", strings.HasPrefix(c.Request.URL.Path, "/user/"))
+		// fmt.Println("<<< After tokenClaims ", tokenClaims)
+		// fmt.Println("<<< tokenClaims['Role'].(string) ", tokenClaims["Role"].(string))
+		// fmt.Println("<<< URL admin? ", strings.HasPrefix(c.Request.URL.Path, "/admin/"))
+		// fmt.Println("<<< URL user? ", strings.HasPrefix(c.Request.URL.Path, "/user/"))
 
 
 		// Check allowed paths based on role
-		if tokenClaims["role"].(string) == "admin" && !strings.HasPrefix(c.Request.URL.Path, "/admin/") {
-			fmt.Println("<<< admin")
+		if tokenClaims["Role"].(string) == "admin" && !strings.HasPrefix(c.Request.URL.Path, "/admin/") {
+			// fmt.Println("<<< admin")
 			c.AbortWithStatusJSON(http.StatusForbidden, errorResponse(fmt.Errorf("Access Forbidden")))
 			return
 
-		} else if tokenClaims["role"].(string) == "user" && !strings.HasPrefix(c.Request.URL.Path, "/user/") {
-			fmt.Println("<<< user")
+		} else if tokenClaims["Role"].(string) == "user" && !strings.HasPrefix(c.Request.URL.Path, "/user/") {
+			// fmt.Println("<<< user")
 			c.AbortWithStatusJSON(http.StatusForbidden, errorResponse(fmt.Errorf("Access Forbidden")))
 			return
 		}
-		fmt.Println("<<< After Check allowed paths")
+		// fmt.Println("<<< After Check allowed paths")
 
 		// Continue processing the request
 		c.Next()
