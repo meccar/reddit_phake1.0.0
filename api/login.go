@@ -63,6 +63,7 @@ func (server *Server) loginHandler(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+	
 
 	// Set the Authorization header in the response
 	// c.Writer.Header().Set("Authorization", "Bearer "+token)

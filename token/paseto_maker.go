@@ -221,9 +221,21 @@ func VerifyPaseto(pv4 *pvx.ProtoV4Public) gin.HandlerFunc  {
 
         
         // Get the public key from the request context
-        publicKey := c.Request.Context().Value("publicKey").(*pvx.AsymPublicKey)
-		fmt.Println("\n <<< publicKey: ", publicKey)
+		value, exists := c.Get("publicKey")
+		if !exists {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized - Missing Credentials"})
+		}
+		fmt.Println("\n <<< publicKey: ", value)
         
+		publicKey, ok := value.(*pvx.AsymPublicKey)
+		if !ok {
+			// Handle the case where the value stored as "publicKey" is not of type *pvx.AsymPublicKey
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid public key type"})
+			return
+		}
+		fmt.Println("\n <<< publicKey: ", publicKey)
+
+
         // Verify the token
         if err := pv4.Verify(token, publicKey, pvx.WithAssert([]byte("test"))).Err(); err != nil {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Forbidden"})
