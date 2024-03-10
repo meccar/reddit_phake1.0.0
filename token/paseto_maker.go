@@ -213,13 +213,16 @@ func pasetoFromCookie(r *http.Request) string {
 func VerifyPaseto(pv4 *pvx.ProtoV4Public) gin.HandlerFunc  {
     return func(c *gin.Context) {
         token := pasetoFromCookie(c.Request)
-        if token == "" {
+        if token == "" { 
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
             return
         }
+		fmt.Println("\n <<< after pasetoFromCookie: ", token)
+
         
         // Get the public key from the request context
         publicKey := c.Request.Context().Value("publicKey").(*pvx.AsymPublicKey)
+		fmt.Println("\n <<< publicKey: ", publicKey)
         
         // Verify the token
         if err := pv4.Verify(token, publicKey, pvx.WithAssert([]byte("test"))).Err(); err != nil {
