@@ -21,11 +21,13 @@ import (
 func GetHandler(pageName string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.HTML(http.StatusOK, pageName, nil)
+		c.Next()
 	}
 }
 
 func (server *Server) handlerWrapper(handler func(c *gin.Context)) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		handler(c)
+		c.Next()
 	}
 }

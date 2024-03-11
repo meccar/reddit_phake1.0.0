@@ -77,6 +77,7 @@ func VerifyRequest(ja *JWTAuth, r *http.Request, findTokenFns ...func(r *http.Re
 			break
 		}
 	}
+	
 	if tokenString == "" {
 		return nil, ErrNoTokenFound
 	}

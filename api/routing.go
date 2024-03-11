@@ -28,36 +28,36 @@ func (server *Server) SetupRoutes() {
 	// Route grouping for authenticated routes
 	authRoutes := server.Router.Group("/")
 	authRoutes.Use(
-		func(c *gin.Context) {
-			fmt.Println("\n c :", c)
-			fmt.Println("\n Entering Verifier middleware")
-		},
+		// func(c *gin.Context) {
+		// 	fmt.Println("\n c :", c)
+		// 	fmt.Println("\n Entering Verifier middleware")
+		// },
 
 		jwtauth.Verifier(server.TokenAuthRS256),
-		func(c *gin.Context) {
-			fmt.Println("\n c :", c)
-			fmt.Println("\n <<< After Verifier")
-		},
+		// func(c *gin.Context) {
+		// 	fmt.Println("\n c :", c)
+		// 	fmt.Println("\n <<< After Verifier")
+		// },
 
-		jwtauth.VerifyPaseto(server.Pv4),
-		func(c *gin.Context) {
-			fmt.Println("\n c :", c)
-			fmt.Println("\n <<< After VerifyPaseto")
-		},
+		// jwtauth.VerifyPaseto(server.Pv4),
+		// func(c *gin.Context) {
+		// 	fmt.Println("\n c :", c)
+		// 	fmt.Println("\n <<< After VerifyPaseto")
+		// },
 
 		// jwtauth.VerifyPaseto(*http.Request),
 
 		jwtauth.Authenticator(server.TokenAuthRS256),
-	    func(c *gin.Context) {
-			fmt.Println("\n c :", c)
-			fmt.Println("\n <<< After Authenticator")
-		},
+	    // func(c *gin.Context) {
+		// 	fmt.Println("\n c :", c)
+		// 	fmt.Println("\n <<< After Authenticator")
+		// },
 
 		roleMiddleware(),
-		func(c *gin.Context) {
-			fmt.Println("\n c :", c)
-			fmt.Println("\n <<< After roleMiddleware")
-		},
+		// func(c *gin.Context) {
+		// 	fmt.Println("\n c :", c)
+		// 	fmt.Println("\n <<< After roleMiddleware")
+		// },
 	)
 	{
 		authRoutes.GET("/:role/:token", UserHandler)

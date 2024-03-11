@@ -13,17 +13,17 @@ func UserHandler(c *gin.Context) {
 	// Extract the role and token from the URL parameters
 	_ = c.Param("role")
 	_ = c.Param("token")
-
-	tokenClaims, err := jwtauth.GetClaims(c.Request)
+	
+	_, claim, err := jwtauth.FromContext(c.Request.Context())
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	if tokenClaims["Role"].(string) == "admin" {
+	if claim["Role"].(string) == "admin" {
 		// web.Render(c.Writer, "admin", nil)
 		c.HTML(http.StatusOK, "admin", nil)
-	} else if tokenClaims["Role"].(string) == "user" {
+	} else if claim["Role"].(string) == "user" {
 		// web.Render(c.Writer, "user", nil)
 		c.HTML(http.StatusOK, "user", nil)
 	} else {

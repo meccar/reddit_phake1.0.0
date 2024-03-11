@@ -61,7 +61,8 @@ func (server *Server) MountMiddleware() {
 func roleMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		
-		tokenClaims, err := token.GetClaims(c.Request)
+
+		_, claim, err := token.FromContext(c.Request.Context())
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 			return
@@ -73,12 +74,12 @@ func roleMiddleware() gin.HandlerFunc {
 
 
 		// Check allowed paths based on role
-		if tokenClaims["Role"].(string) == "admin" && !strings.HasPrefix(c.Request.URL.Path, "/admin/") {
+		if claim["Role"].(string) == "admin" && !strings.HasPrefix(c.Request.URL.Path, "/admin/") {
 			// fmt.Println("<<< admin")
 			c.AbortWithStatusJSON(http.StatusForbidden, errorResponse(fmt.Errorf("Access Forbidden")))
 			return
 
-		} else if tokenClaims["Role"].(string) == "user" && !strings.HasPrefix(c.Request.URL.Path, "/user/") {
+		} else if claim["Role"].(string) == "user" && !strings.HasPrefix(c.Request.URL.Path, "/user/") {
 			// fmt.Println("<<< user")
 			c.AbortWithStatusJSON(http.StatusForbidden, errorResponse(fmt.Errorf("Access Forbidden")))
 			return

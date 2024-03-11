@@ -9,7 +9,7 @@ import (
 
 type LoginAccountTxParams struct {
 	loginAccountParams
-	Session Session
+	// Session Session
 }
 
 func (h *Handlers) VerifyLogin(ctx context.Context, arg *LoginAccountTxParams) error {

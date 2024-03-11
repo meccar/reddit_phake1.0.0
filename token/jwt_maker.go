@@ -6,6 +6,7 @@ import (
 	"encoding/pem"
 	"net/http"
 	"time"
+	"fmt"
 
 	util "util"
 
@@ -139,9 +140,15 @@ func DeleteJWTCookie(c *gin.Context, token string) {
 	})
 }
 
-func GetClaims(r *http.Request) (map[string]interface{}, error) {
+func GetClaims(c *gin.Context) (map[string]interface{}, error) {
 	// Get token string from cookie
-	tokenString := TokenFromCookie(r)
+	tokenString := TokenFromCookie(c.Request)
+	tokenTest, claim, _ := FromContext(c.Request.Context())
+	tokenTest1, _, _ := FromContext(context.Background())
+
+	fmt.Println("\n GetClaims tokenTest: ",tokenTest)
+	fmt.Println("\n GetClaims tokenTest1: ",tokenTest1)
+	fmt.Println("\n GetClaims claim: ",claim)
 
 	// Decode token
 	token, err := TokenAuthRS256.Decode(tokenString)

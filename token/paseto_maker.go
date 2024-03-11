@@ -2,6 +2,7 @@ package token
 
 import (
 	"fmt"
+	"context"
 	"net/http"
 	"errors"
 	"time"
@@ -160,9 +161,12 @@ func CreateToken(username string, role string, duration time.Duration, c *gin.Co
 	}
 	fmt.Println("\n <<< after Sign token: ", token)
 
+	c.Request = c.Request.WithContext(context.WithValue(c.Request.Context(), "publicKey", pk))
+
 	c.Set("publicKey", pk)
 	fmt.Println("CreateToken c :", c)
 	SetPasetoCookie(c, token, role, int(duration.Seconds()))
+
 	return err
 }
 
@@ -178,10 +182,11 @@ func SetPasetoCookie(c *gin.Context, token, role string, duration int) {
 		Value: token,
 		Path:  "/",
 	})
+	c.Next()
 }
 
-func pasetoFromCookie(r *http.Request) string {
-	cookie, err := r.Cookie("paseto")
+func pasetoFromCookie(c *gin.Context) string {
+	cookie, err := c.Request.Cookie("paseto")
 	if err != nil {
 		return ""
 	}
@@ -213,7 +218,7 @@ func pasetoFromCookie(r *http.Request) string {
 
 func VerifyPaseto(pv4 *pvx.ProtoV4Public) gin.HandlerFunc  {
     return func(c *gin.Context) {
-        token := pasetoFromCookie(c.Request)
+        token := pasetoFromCookie(c)
         if token == "" { 
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
             return
@@ -222,15 +227,7 @@ func VerifyPaseto(pv4 *pvx.ProtoV4Public) gin.HandlerFunc  {
 
 		fmt.Println("VerifyPaseto c :", c)
         // Get the public key from the request context
-		value1, _ := c.Get("Paseto_Authorization")
 		value := c.GetHeader("Paseto_Authorization")
-		value2 := c.GetString("Paseto_Authorization")
-		value3 := c.Value("Paseto_Authorization")
-		
-		fmt.Println("\n <<< Get: ", value1)
-		fmt.Println("\n <<< GetHeader: ", value)
-		fmt.Println("\n <<< GetString: ", value2)
-		fmt.Println("\n <<< Value: ", value3)
 
 		// if !exists {
 			// c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized - Missing Credentials"})
