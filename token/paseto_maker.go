@@ -7,7 +7,6 @@ import (
 	"errors"
 	"time"
 	"encoding/hex"
-	"encoding/base64"
 
 	util "util"
 
@@ -15,87 +14,6 @@ import (
 	"github.com/vk-rv/pvx"
 	"github.com/gin-gonic/gin"
 )
-// "encoding/hex"
-
-// "aidanwoods.dev/go-paseto"
-
-// func CreateToken(username string, role string, duration time.Duration, w http.ResponseWriter) error {
-
-// 	payload, err := NewPayload(username, role, duration)
-// 	if err != nil {
-// 		log.Error().Err(err)
-// 		return err
-// 	}
-// 	token := paseto.NewToken()
-// 	token.SetAudience("audience")
-// 	token.SetJti("identifier")
-// 	token.SetIssuer("issuer")
-// 	token.SetSubject("subject")
-// 	token.SetString("username", payload.Username)
-// 	token.SetString("role", payload.Role)
-
-// 	secretKey := paseto.NewV4AsymmetricSecretKey()
-// 	fmt.Println("\n secretKey: ", secretKey)
-
-// 	publicKey := secretKey.Public()
-// 	fmt.Println("\n publicKey: ", publicKey)
-
-// 	signed := token.V4Sign(secretKey, nil)
-// 	fmt.Println("\n signed: ", signed)
-
-// 	SetPasetoCookie(w, signed, role, int(1*time.Minute.Seconds()))
-
-// 	parser := paseto.NewParserWithoutExpiryCheck()
-
-// 	parsetoken, err := parser.ParseV4Public(publicKey, signed, nil)
-// 	if err != nil {
-// 		log.Error().Err(err)
-// 		return err
-// 	}
-// 	fmt.Println("\n parsetoken: ", parsetoken)
-// 	fmt.Println("\n string(token.ClaimsJSON()): ", string(token.ClaimsJSON()))
-// 	fmt.Println("\n string(token.Footer()): ", string(token.Footer()))
-
-// 	return err
-// }
-
-
-// k, err := hex.DecodeString(TokenSecret)
-// if err != nil {
-	// return err 
-// }
-// fmt.Println("\n k: ", k)
-// 
-// symK := pvx.NewSymmetricKey(k, pvx.Version4)
-// fmt.Println("\n symK: ", symK)
-// 
-// pv4 := pvx.NewPV4Local()
-// fmt.Println("\n pv4: ", pv4)
-
-// token, err := pv4.Encrypt(symK, claims, pvx.WithAssert([]byte("test")))
-// if err != nil {
-	// return err
-// }
-// fmt.Println("\n <<< after Encrypt 1 token: ", token)
-// 
-// cc := MyClaims{}
-// 
-// err = pv4.
-	// Decrypt(token, symK, pvx.WithAssert([]byte("test"))).
-	// ScanClaims(&cc)
-// if err != nil {
-	// return err 
-// }
-// work with cc claims ...
-// 
-// or without assert
-// token, err := pv4.Encrypt(symK, claims)
-// if err != nil {
-	// return err
-// }
-// fmt.Println("\n <<< after Encrypt 2 token: ", token)
-// 
-// err = pv4.Decrypt(token, symK).ScanClaims(&cc)
 
 type AdditionalClaims struct {
 	Username  string    `json:"username"`
@@ -108,6 +26,35 @@ type MyClaims struct {
 	AdditionalClaims
 } 
 
+var sk *pvx.AsymSecretKey
+var pk *pvx.AsymPublicKey
+
+func initPaseto() {
+	config, err := util.LoadConfig(".")
+	if err != nil {
+		log.Fatal().Err(err).Msg("cannot load config")
+	}
+
+	TokenSecret = config.TokenSymmetricKey
+	
+	k, err := hex.DecodeString(TokenSecret)
+	if err != nil {
+		log.Fatal().Err(err)
+	}
+
+  	sk = pvx.NewAsymmetricSecretKey(k, pvx.Version4)
+	if sk == nil {
+		log.Fatal().Msg("failed to create asymmetric secret key")
+	}
+	fmt.Println("Paseto sk: ", sk)
+
+  	pk = pvx.NewAsymmetricPublicKey(k, pvx.Version4)
+	if pk == nil {
+		log.Fatal().Msg("failed to create asymmetric public key")
+	}
+	fmt.Println("Paseto pk: ", pk)
+}
+
 func (c *MyClaims) Valid() error {
 
 	validationErr := &pvx.ValidationError{}
@@ -117,21 +64,14 @@ func (c *MyClaims) Valid() error {
 		errors.As(err, &validationErr)
 	}
 	
-	//  then, perform custom validation
-	
-	
 	return nil 
 	
 }
 
 func CreateToken(username string, role string, duration time.Duration, c *gin.Context) error {
-	config, err := util.LoadConfig(".")
-	if err != nil {
-		log.Fatal().Err(err).Msg("cannot load config")
-	}
 
-	TokenSecret = config.TokenSymmetricKey
-	
+	pv4 := pvx.NewPV4Public()
+
 	now := time.Now()
 	claims := &MyClaims{
 		RegisteredClaims: pvx.RegisteredClaims{
@@ -142,19 +82,6 @@ func CreateToken(username string, role string, duration time.Duration, c *gin.Co
 		AdditionalClaims: AdditionalClaims{Username: username, Role: role, Date: time.Now().Add(time.Minute * 60)},
 	}
 
-	pv4 := pvx.NewPV4Public()
-
-	k, err := hex.DecodeString(TokenSecret)
-	if err != nil {
-		log.Fatal().Err(err)
-	}
-
-	sk := pvx.NewAsymmetricSecretKey(k, pvx.Version4)
-	fmt.Println("\n sk: ", sk)
-
-	pk := pvx.NewAsymmetricPublicKey(k, pvx.Version4)
-	fmt.Println("\n pk: ", pk)
-
 	token, err := pv4.Sign(sk, claims, pvx.WithAssert([]byte("test")))
 	if err != nil {
 		log.Fatal().Err(err)
@@ -163,8 +90,6 @@ func CreateToken(username string, role string, duration time.Duration, c *gin.Co
 
 	c.Request = c.Request.WithContext(context.WithValue(c.Request.Context(), "publicKey", pk))
 
-	c.Set("publicKey", pk)
-	fmt.Println("CreateToken c :", c)
 	SetPasetoCookie(c, token, role, int(duration.Seconds()))
 
 	return err
@@ -225,33 +150,8 @@ func VerifyPaseto(pv4 *pvx.ProtoV4Public) gin.HandlerFunc  {
         }
 		fmt.Println("\n <<< after pasetoFromCookie: ", token)
 
-		fmt.Println("VerifyPaseto c :", c)
-        // Get the public key from the request context
-		value := c.GetHeader("Paseto_Authorization")
-
-		// if !exists {
-			// c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized - Missing Credentials"})
-			// return
-		// }
-        
-		// publicKey, ok := value.(*pvx.AsymPublicKey)
-		// if !ok {
-		// 	// Handle the case where the value stored as "publicKey" is not of type *pvx.AsymPublicKey
-		// 	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid public key type"})
-		// 	return
-		// }
-		// fmt.Println("\n <<< publicKey: ", publicKey)
-		decodedKey, err := base64.StdEncoding.DecodeString(value)
-		if err != nil {
-		    // Handle the error if decoding fails
-		    c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid public key format"})
-		    return
-		}
-
-		publicKey := pvx.NewAsymmetricPublicKey(decodedKey, pvx.Version4)
-		
         // Verify the token
-        if err := pv4.Verify(token, publicKey, pvx.WithAssert([]byte("test"))).Err(); err != nil {
+        if err := pv4.Verify(token, pk, pvx.WithAssert([]byte("test"))).Err(); err != nil {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Forbidden"})
             return
         }

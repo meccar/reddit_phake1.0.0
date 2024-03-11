@@ -122,8 +122,7 @@ func (t *JWTAuth) SetJWTCookie(w http.ResponseWriter, token, role string, durati
 		MaxAge:   duration,
 		// SameSite: http.SameSiteLaxMode,
 		SameSite: http.SameSiteStrictMode,
-		// Uncomment below for HTTPS:
-		// Secure: true,
+		Secure: true,
 		Value: token,
 		Path: "/",
 	})

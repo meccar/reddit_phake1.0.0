@@ -49,7 +49,7 @@ func (server *Server) MountMiddleware() {
 	server.Router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token","Accept-Encoding","Cache-Control","X-Requested-With","Origin"},
+		AllowHeaders:     []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token","Accept-Encoding","Cache-Control","X-Requested-With","Origin","Content-Security-Policy", "default-src 'self'"},
 		ExposeHeaders:    []string{"Content-Length", "Link"},
 		AllowCredentials: true,
 		MaxAge:           300,
