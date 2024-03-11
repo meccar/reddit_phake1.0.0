@@ -26,8 +26,8 @@ type MyClaims struct {
 	AdditionalClaims
 } 
 
-var sk *pvx.AsymSecretKey
-var pk *pvx.AsymPublicKey
+var sk pvx.AsymSecretKey
+var pk pvx.AsymPublicKey
 
 func initPaseto() {
 	config, err := util.LoadConfig(".")
@@ -42,16 +42,10 @@ func initPaseto() {
 		log.Fatal().Err(err)
 	}
 
-  	sk = pvx.NewAsymmetricSecretKey(k, pvx.Version4)
-	if sk == nil {
-		log.Fatal().Msg("failed to create asymmetric secret key")
-	}
+  	sk = *pvx.NewAsymmetricSecretKey(k, pvx.Version4)
 	fmt.Println("Paseto sk: ", sk)
 
-  	pk = pvx.NewAsymmetricPublicKey(k, pvx.Version4)
-	if pk == nil {
-		log.Fatal().Msg("failed to create asymmetric public key")
-	}
+  	pk = *pvx.NewAsymmetricPublicKey(k, pvx.Version4)
 	fmt.Println("Paseto pk: ", pk)
 }
 
@@ -82,7 +76,7 @@ func CreateToken(username string, role string, duration time.Duration, c *gin.Co
 		AdditionalClaims: AdditionalClaims{Username: username, Role: role, Date: time.Now().Add(time.Minute * 60)},
 	}
 
-	token, err := pv4.Sign(sk, claims, pvx.WithAssert([]byte("test")))
+	token, err := pv4.Sign(&sk, claims, pvx.WithAssert([]byte("test")))
 	if err != nil {
 		log.Fatal().Err(err)
 	}
@@ -151,7 +145,7 @@ func VerifyPaseto(pv4 *pvx.ProtoV4Public) gin.HandlerFunc  {
 		fmt.Println("\n <<< after pasetoFromCookie: ", token)
 
         // Verify the token
-        if err := pv4.Verify(token, pk, pvx.WithAssert([]byte("test"))).Err(); err != nil {
+        if err := pv4.Verify(token, &pk, pvx.WithAssert([]byte("test"))).Err(); err != nil {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Forbidden"})
             return
         }
