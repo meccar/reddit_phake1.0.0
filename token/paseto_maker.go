@@ -6,6 +6,7 @@ import (
 	"errors"
 	"time"
 	"crypto/ed25519"
+	"encoding/base64"
 
 	util "util"
 
@@ -129,6 +130,7 @@ func CreateToken(username string, role string, duration time.Duration, c *gin.Co
 	}
 
 	TokenSecret = config.TokenSymmetricKey
+	
 	now := time.Now()
 	claims := &MyClaims{
 		RegisteredClaims: pvx.RegisteredClaims{
@@ -151,6 +153,10 @@ func CreateToken(username string, role string, duration time.Duration, c *gin.Co
 	pk := pvx.NewAsymmetricPublicKey(publicKey, pvx.Version4)
 	fmt.Println("\n pk: ", pk)
 
+	test1, test2, _ := pvx.encode(claims, nil)
+
+  	fmt.Println("\n <<< before Sign token: ", test1)
+  	fmt.Println("\n <<< before Sign token: ", test2)
 
 	token, err := pv4.Sign(sk, claims, pvx.WithAssert([]byte("test")))
 	if err != nil {
@@ -158,9 +164,10 @@ func CreateToken(username string, role string, duration time.Duration, c *gin.Co
 	}
 	fmt.Println("\n <<< after Sign token: ", token)
 
+	publicKeyString := base64.StdEncoding.EncodeToString(publicKey)
 
-
-	c.Set("publicKey", publicKey)
+	c.Set("publicKey", publicKeyString)
+	fmt.Println("c :", c)
 	SetPasetoCookie(c, token, role, int(duration.Seconds()))
 	return err
 }
@@ -219,23 +226,39 @@ func VerifyPaseto(pv4 *pvx.ProtoV4Public) gin.HandlerFunc  {
         }
 		fmt.Println("\n <<< after pasetoFromCookie: ", token)
 
-        
+		fmt.Println("c :", c)
         // Get the public key from the request context
-		value, exists := c.Get("publicKey")
-		if !exists {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized - Missing Credentials"})
-		}
-		fmt.Println("\n <<< publicKey: ", value)
+		value1, _ := c.Get("Paseto_Authorization")
+		value := c.GetHeader("Paseto_Authorization")
+		value2 := c.GetString("Paseto_Authorization")
+		value3 := c.Value("Paseto_Authorization")
+		
+		fmt.Println("\n <<< Get: ", value1)
+		fmt.Println("\n <<< GetHeader: ", value)
+		fmt.Println("\n <<< GetString: ", value2)
+		fmt.Println("\n <<< Value: ", value3)
+
+		// if !exists {
+			// c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized - Missing Credentials"})
+			// return
+		// }
         
-		publicKey, ok := value.(*pvx.AsymPublicKey)
-		if !ok {
-			// Handle the case where the value stored as "publicKey" is not of type *pvx.AsymPublicKey
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid public key type"})
-			return
+		// publicKey, ok := value.(*pvx.AsymPublicKey)
+		// if !ok {
+		// 	// Handle the case where the value stored as "publicKey" is not of type *pvx.AsymPublicKey
+		// 	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid public key type"})
+		// 	return
+		// }
+		// fmt.Println("\n <<< publicKey: ", publicKey)
+		decodedKey, err := base64.StdEncoding.DecodeString(value)
+		if err != nil {
+		    // Handle the error if decoding fails
+		    c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid public key format"})
+		    return
 		}
-		fmt.Println("\n <<< publicKey: ", publicKey)
 
-
+		publicKey := pvx.NewAsymmetricPublicKey(decodedKey, pvx.Version4)
+		
         // Verify the token
         if err := pv4.Verify(token, publicKey, pvx.WithAssert([]byte("test"))).Err(); err != nil {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Forbidden"})
