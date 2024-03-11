@@ -58,7 +58,7 @@ func (server *Server) loginHandler(c *gin.Context) {
 	}
 
 	// Create a session for the user
-	msg.Session, err = server.DbHandler.CreateSession(c.Request.Context(), msg.Username, role)
+	_, err = server.DbHandler.CreateSession(c.Request.Context(), msg.Username, role)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -70,6 +70,8 @@ func (server *Server) loginHandler(c *gin.Context) {
 
 	// Respond with the login message
 	c.JSON(http.StatusOK, msg)
+
+	c.Next()
 }
 
 // loginForm parses the login form data from the HTTP request

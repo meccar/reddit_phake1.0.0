@@ -19,11 +19,11 @@ func (server *Server) SetupRoutes() {
 
 	// Public routes
 	server.Router.GET("/lienhe", GetHandler("lienhe"))
-	server.Router.GET("/login", GetHandler("login"))
 	server.Router.GET("/register", GetHandler("register"))
 	server.Router.GET("/", GetHandler("home"))
 	server.Router.GET("/thankyou", GetHandler("thankyou"))
 	server.Router.GET("/tintuc", server.handleNews)
+	server.Router.GET("/login", GetHandler("login"))
 
 	// Route grouping for authenticated routes
 	authRoutes := server.Router.Group("/")
