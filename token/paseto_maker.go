@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"errors"
 	"time"
-	"crypto/ed25519"
+	"encoding/hex"
 	"encoding/base64"
 
 	util "util"
@@ -143,20 +143,16 @@ func CreateToken(username string, role string, duration time.Duration, c *gin.Co
 
 	pv4 := pvx.NewPV4Public()
 
-	publicKey, privateKey, _ := ed25519.GenerateKey(nil)
-	fmt.Println("\n publicKey: ", publicKey)
-	fmt.Println("\n privateKey: ", privateKey)
+	k, err := hex.DecodeString(TokenSecret)
+	if err != nil {
+		log.Fatal().Err(err)
+	}
 
-	sk := pvx.NewAsymmetricSecretKey(privateKey, pvx.Version4)
+	sk := pvx.NewAsymmetricSecretKey(k, pvx.Version4)
 	fmt.Println("\n sk: ", sk)
 
-	pk := pvx.NewAsymmetricPublicKey(publicKey, pvx.Version4)
+	pk := pvx.NewAsymmetricPublicKey(k, pvx.Version4)
 	fmt.Println("\n pk: ", pk)
-
-	test1, test2, _ := pvx.encode(claims, nil)
-
-  	fmt.Println("\n <<< before Sign token: ", test1)
-  	fmt.Println("\n <<< before Sign token: ", test2)
 
 	token, err := pv4.Sign(sk, claims, pvx.WithAssert([]byte("test")))
 	if err != nil {
@@ -164,9 +160,7 @@ func CreateToken(username string, role string, duration time.Duration, c *gin.Co
 	}
 	fmt.Println("\n <<< after Sign token: ", token)
 
-	publicKeyString := base64.StdEncoding.EncodeToString(publicKey)
-
-	c.Set("publicKey", publicKeyString)
+	c.Set("publicKey", pk)
 	fmt.Println("c :", c)
 	SetPasetoCookie(c, token, role, int(duration.Seconds()))
 	return err
