@@ -61,17 +61,11 @@ func (server *Server) MountMiddleware() {
 func roleMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		
-
-		_, claim, err := token.FromContext(c.Request.Context())
+		claim, err := token.GetClaims(c)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
-		// fmt.Println("<<< After tokenClaims ", tokenClaims)
-		// fmt.Println("<<< tokenClaims['Role'].(string) ", tokenClaims["Role"].(string))
-		// fmt.Println("<<< URL admin? ", strings.HasPrefix(c.Request.URL.Path, "/admin/"))
-		// fmt.Println("<<< URL user? ", strings.HasPrefix(c.Request.URL.Path, "/user/"))
-
 
 		// Check allowed paths based on role
 		if claim["Role"].(string) == "admin" && !strings.HasPrefix(c.Request.URL.Path, "/admin/") {

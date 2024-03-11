@@ -10,20 +10,16 @@ import (
 )
 
 func UserHandler(c *gin.Context) {
-	var requestBody map[string]interface{}
-	// Extract the role and token from the URL parameters
-	_ = c.Param("role")
-	_ = c.Param("token")
-	
-	token, claim, err := jwtauth.FromContext(c.Request.Context())
+	claim, err := jwtauth.GetClaims(c)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	tokenTest1, _ := requestBody["token"].(string)
-	fmt.Println("\n GetClaims token: ",token)
-	fmt.Println("\n GetClaims tokenTest1: ",tokenTest1)
 
+	if c.Param("token") != jwtauth.TokenFromCookie(c.Request){
+		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(fmt.Errorf("Access Forbidden")))
+		return
+	}
 
 	if claim["Role"].(string) == "admin" {
 		// web.Render(c.Writer, "admin", nil)
