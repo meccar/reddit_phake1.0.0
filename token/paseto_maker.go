@@ -161,7 +161,7 @@ func CreateToken(username string, role string, duration time.Duration, c *gin.Co
 	fmt.Println("\n <<< after Sign token: ", token)
 
 	c.Set("publicKey", pk)
-	fmt.Println("c :", c)
+	fmt.Println("CreateToken c :", c)
 	SetPasetoCookie(c, token, role, int(duration.Seconds()))
 	return err
 }
@@ -220,7 +220,7 @@ func VerifyPaseto(pv4 *pvx.ProtoV4Public) gin.HandlerFunc  {
         }
 		fmt.Println("\n <<< after pasetoFromCookie: ", token)
 
-		fmt.Println("c :", c)
+		fmt.Println("VerifyPaseto c :", c)
         // Get the public key from the request context
 		value1, _ := c.Get("Paseto_Authorization")
 		value := c.GetHeader("Paseto_Authorization")

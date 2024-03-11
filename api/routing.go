@@ -29,29 +29,34 @@ func (server *Server) SetupRoutes() {
 	authRoutes := server.Router.Group("/")
 	authRoutes.Use(
 		func(c *gin.Context) {
-			fmt.Println("Entering Verifier middleware")
+			fmt.Println("\n c :", c)
+			fmt.Println("\n Entering Verifier middleware")
 		},
 
 		jwtauth.Verifier(server.TokenAuthRS256),
 		func(c *gin.Context) {
-			fmt.Println("<<< After Verifier")
+			fmt.Println("\n c :", c)
+			fmt.Println("\n <<< After Verifier")
 		},
 
 		jwtauth.VerifyPaseto(server.Pv4),
 		func(c *gin.Context) {
-			fmt.Println("<<< After VerifyPaseto")
+			fmt.Println("\n c :", c)
+			fmt.Println("\n <<< After VerifyPaseto")
 		},
 
 		// jwtauth.VerifyPaseto(*http.Request),
 
 		jwtauth.Authenticator(server.TokenAuthRS256),
 	    func(c *gin.Context) {
-			fmt.Println("<<< After Authenticator")
+			fmt.Println("\n c :", c)
+			fmt.Println("\n <<< After Authenticator")
 		},
 
 		roleMiddleware(),
 		func(c *gin.Context) {
-			fmt.Println("<<< After roleMiddleware")
+			fmt.Println("\n c :", c)
+			fmt.Println("\n <<< After roleMiddleware")
 		},
 	)
 	{
