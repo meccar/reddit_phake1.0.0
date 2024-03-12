@@ -23,8 +23,7 @@ CREATE TABLE Post (
   title VARCHAR NOT NULL,
   article TEXT NOT NULL,
   picture BYTEA,
-  -- username VARCHAR NOT NULL, 
-  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
   -- FOREIGN KEY (username) REFERENCES Account (username)
 
