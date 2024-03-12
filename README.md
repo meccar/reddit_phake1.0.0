@@ -1,13 +1,16 @@
 run Makefile to config system
 
 how to run?
-in terminal:
+
 
 1- COPY this code then run it in terminal:
 
   curl -s https://packagecloud.io/install/repositories/golang-migrate/migrate/script.deb.sh | sudo bash
+  
   sudo apt-get update
+  
   sudo apt-get install -y migrate
+  
 
 2- Run "make postgres" in terminal
 
