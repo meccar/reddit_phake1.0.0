@@ -25,7 +25,7 @@ var RegisterRules = map[string]interface{}{
 }
 
 func isAdmin(email string) bool {
-	return strings.HasSuffix(email, "@tafviet.com")
+	return strings.HasSuffix(email, "@google.com")
 }
 
 func (register *CreateAccountTxParams) ValidateRegister(ctx context.Context) error {

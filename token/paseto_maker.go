@@ -1,12 +1,11 @@
 package token
 
 import (
+	"encoding/hex"
 	"fmt"
-	"context"
 	"net/http"
 	"errors"
 	"time"
-	"encoding/hex"
 
 	util "util"
 
@@ -26,27 +25,24 @@ type MyClaims struct {
 	AdditionalClaims
 } 
 
-var sk pvx.AsymSecretKey
-var pk pvx.AsymPublicKey
+var (
+	sk *pvx.AsymSecretKey	
+	pk *pvx.AsymPublicKey
+)
 
-func initPaseto() {
+func init() {
 	config, err := util.LoadConfig(".")
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot load config")
 	}
 
-	TokenSecret = config.TokenSymmetricKey
-	
-	k, err := hex.DecodeString(TokenSecret)
+	k, err := hex.DecodeString(config.TokenSymmetricKey)
 	if err != nil {
 		log.Fatal().Err(err)
 	}
 
-  	sk = *pvx.NewAsymmetricSecretKey(k, pvx.Version4)
-	fmt.Println("Paseto sk: ", sk)
-
-  	pk = *pvx.NewAsymmetricPublicKey(k, pvx.Version4)
-	fmt.Println("Paseto pk: ", pk)
+  	sk = pvx.NewAsymmetricSecretKey(k, pvx.Version4)
+  	pk = pvx.NewAsymmetricPublicKey(k, pvx.Version4)
 }
 
 func (c *MyClaims) Valid() error {
@@ -75,14 +71,15 @@ func CreateToken(username string, role string, duration time.Duration, c *gin.Co
 		},
 		AdditionalClaims: AdditionalClaims{Username: username, Role: role, Date: time.Now().Add(time.Minute * 60)},
 	}
+	fmt.Println("CreateToken sk: ", sk)
 
-	token, err := pv4.Sign(&sk, claims, pvx.WithAssert([]byte("test")))
+	token, err := pv4.Sign(sk, claims, pvx.WithAssert([]byte("test")))
 	if err != nil {
 		log.Fatal().Err(err)
 	}
 	fmt.Println("\n <<< after Sign token: ", token)
 
-	c.Request = c.Request.WithContext(context.WithValue(c.Request.Context(), "publicKey", pk))
+	// c.Request = c.Request.WithContext(context.WithValue(c.Request.Context(), "publicKey", pk))
 
 	SetPasetoCookie(c, token, role, int(duration.Seconds()))
 
@@ -96,8 +93,7 @@ func SetPasetoCookie(c *gin.Context, token, role string, duration int) {
 		MaxAge:   duration,
 		// SameSite: http.SameSiteLaxMode,
 		SameSite: http.SameSiteStrictMode,
-		// Uncomment below for HTTPS:
-		// Secure: true,
+		Secure: true,
 		Value: token,
 		Path:  "/",
 	})
@@ -143,9 +139,10 @@ func VerifyPaseto(pv4 *pvx.ProtoV4Public) gin.HandlerFunc  {
             return
         }
 		fmt.Println("\n <<< after pasetoFromCookie: ", token)
+		fmt.Println("VerifyPaseto pk: ", pk)
 
         // Verify the token
-        if err := pv4.Verify(token, &pk, pvx.WithAssert([]byte("test"))).Err(); err != nil {
+        if err := pv4.Verify(token, pk, pvx.WithAssert([]byte("test"))).Err(); err != nil {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Forbidden"})
             return
         }

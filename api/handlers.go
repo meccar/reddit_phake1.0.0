@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"encoding/json"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,6 +23,29 @@ func GetHandler(pageName string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.HTML(http.StatusOK, pageName, nil)
 		c.Next()
+	}
+}
+
+func GetJSONHandler(pageName string, apiURL string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Fetch JSON data from the API endpoint
+		resp, err := http.Get(apiURL)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch data"})
+			return
+		}
+		defer resp.Body.Close()
+
+		// Decode the JSON response
+		var data interface{}
+		err = json.NewDecoder(resp.Body).Decode(&data)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode JSON"})
+			return
+		}
+
+		// Render the HTML page with the specified name and pass the JSON data
+		c.HTML(http.StatusOK, pageName, gin.H{"data": data})
 	}
 }
 

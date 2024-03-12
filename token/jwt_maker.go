@@ -12,7 +12,6 @@ import (
 	"github.com/lestrrat-go/jwx/v2/jwa"
 	"github.com/rs/zerolog/log"
 	"github.com/gin-gonic/gin"
-
 )
 
 var (
@@ -70,8 +69,6 @@ func init() {
 
 	// Initialize a JWTAuth object with the RSA private and public keys
 	TokenAuthRS256 = New(jwa.RS256.String(), privateKey, publicKey)
-
-	// Initialize a JWTAuth object with the HSA key
 }
 
 func (t *JWTAuth) MakeToken(id, username, role string, w http.ResponseWriter) error {
@@ -158,30 +155,6 @@ func GetClaims(c *gin.Context) (map[string]interface{}, error) {
 
 	return tokenClaims, nil
 }
-
-// func JWTVerifierMiddleware(ja *JWTAuth) gin.HandlerFunc {
-//     verifier := Verifier(ja)
-//     return func(c *gin.Context) {
-//         // Convert the context to http.Handler
-//         h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-//             c.Next()
-//         })
-//         // Pass the converted handler to the verifier
-//         verifier(h).ServeHTTP(c.Writer, c.Request)
-//     }
-// }
-
-// func JWTAuthenticatorMiddleware(ja *JWTAuth) gin.HandlerFunc {
-//     authenticator := Authenticator(ja)
-//     return func(c *gin.Context) {
-//         // Convert the context to http.Handler
-//         h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-//             c.Next()
-//         })
-//         // Pass the converted handler to the authenticator
-//         authenticator(h).ServeHTTP(c.Writer, c.Request)
-//     }
-// }
 
 
 // func LoggedInRedirector(next http.Handler) http.Handler {

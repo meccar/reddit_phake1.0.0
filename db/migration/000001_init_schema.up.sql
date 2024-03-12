@@ -23,9 +23,9 @@ CREATE TABLE Post (
   title VARCHAR NOT NULL,
   article TEXT NOT NULL,
   picture BYTEA,
-  username VARCHAR NOT NULL, 
+  -- username VARCHAR NOT NULL, 
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (username) REFERENCES Account (username)
+  -- FOREIGN KEY (username) REFERENCES Account (username)
 );
 
 CREATE TABLE Session (
@@ -49,4 +49,4 @@ CREATE TABLE Verify_email (
 ALTER TABLE Verify_email ADD FOREIGN KEY (username) REFERENCES Account (username);
 
 -- Added foreign key constraint to Post table
-ALTER TABLE Post ADD FOREIGN KEY (username) REFERENCES Account (username);
+-- ALTER TABLE Post ADD FOREIGN KEY (username) REFERENCES Account (username);

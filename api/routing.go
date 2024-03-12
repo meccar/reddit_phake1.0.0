@@ -2,7 +2,6 @@ package api
 
 import (
 	"net/http"
-	"fmt"
 	
 	jwtauth "token"
 
@@ -22,42 +21,37 @@ func (server *Server) SetupRoutes() {
 	server.Router.GET("/register", GetHandler("register"))
 	server.Router.GET("/", GetHandler("home"))
 	server.Router.GET("/thankyou", GetHandler("thankyou"))
-	server.Router.GET("/tintuc", server.handleNews)
+	server.Router.GET("/tintuc", GetHandler("tintuc"))
 	server.Router.GET("/login", GetHandler("login"))
 
 	// Route grouping for authenticated routes
 	authRoutes := server.Router.Group("/")
 	authRoutes.Use(
-		func(c *gin.Context) {
-			fmt.Println("\n c :", c)
-			fmt.Println("\n Entering Verifier middleware")
-		},
+		// func(c *gin.Context) {
+		// 	fmt.Println("\n Entering Verifier middleware")
+		// },
 
 		jwtauth.Verifier(server.TokenAuthRS256),
-		func(c *gin.Context) {
-			fmt.Println("\n c :", c)
-			fmt.Println("\n <<< After Verifier")
-		},
+		// func(c *gin.Context) {
+		// 	fmt.Println("\n <<< After Verifier")
+		// },
 
-		jwtauth.VerifyPaseto(server.Pv4),
-		func(c *gin.Context) {
-			fmt.Println("\n c :", c)
-			fmt.Println("\n <<< After VerifyPaseto")
-		},
+		// jwtauth.VerifyPaseto(server.Pv4),
+		// func(c *gin.Context) {
+		// 	fmt.Println("\n <<< After VerifyPaseto")
+		// },
 
 		// jwtauth.VerifyPaseto(*http.Request),
 
 		jwtauth.Authenticator(server.TokenAuthRS256),
-	    func(c *gin.Context) {
-			fmt.Println("\n c :", c)
-			fmt.Println("\n <<< After Authenticator")
-		},
+	    // func(c *gin.Context) {
+		// 	fmt.Println("\n <<< After Authenticator")
+		// },
 
 		roleMiddleware(),
-		func(c *gin.Context) {
-			fmt.Println("\n c :", c)
-			fmt.Println("\n <<< After roleMiddleware")
-		},
+		// func(c *gin.Context) {
+		// 	fmt.Println("\n <<< After roleMiddleware")
+		// },
 	)
 	{
 		authRoutes.GET("/:role/:token", UserHandler)
@@ -76,8 +70,10 @@ func (server *Server) SetupRoutes() {
 		apiRoutes.POST("/login", server.handlerWrapper(server.loginHandler))
 		apiRoutes.POST("/post", server.handlerWrapper(server.postHandler))
 		apiRoutes.POST("/logout", server.handlerWrapper(server.logoutHandler))
-	}
+		apiRoutes.GET("/tintuc", server.handleNews)
 
+	}
+	
 	// No route handler
 	server.Router.NoRoute(func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/")

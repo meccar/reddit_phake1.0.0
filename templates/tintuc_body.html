@@ -1,13 +1,31 @@
 {{define "tintuc_body"}}
 <h1>Latest News</h1>
-<ul>
-    {{ range . }}
-    <li>
-        <h2>{{ .Title }}</h2>
-        <p>{{ .Article }}</p>
-        <!-- Add image display if needed -->
-        <img src="{{ .Picture }}" alt="{{ .Title }}">
-    </li>
-    {{ end }}
-</ul>
+<ul id="news-list"></ul>
+<script>
+    const fetchNews = async () => {
+        try {
+            const response = await fetch('/api/v1/tintuc');
+            const data = await response.json();
+            console.log(data); // Verify that you receive the expected JSON response
+            renderNews(data); // Call a function to render the received data
+        } catch (error) {
+            console.error('Error fetching news:', error);
+        }
+    }
+
+    const renderNews = (news) => {
+        const newsList = document.getElementById('news-list');
+        news.forEach(item => {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `
+                <h2>${item.Title}</h2>
+                <p>${item.Article}</p>
+                <img src="${item.Picture}" alt="${item.Title}">
+            `;
+            newsList.appendChild(listItem);
+        });
+    }
+
+    fetchNews();
+</script>
 {{end}}
