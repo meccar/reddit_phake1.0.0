@@ -20,6 +20,6 @@ in terminal:
 
 6- Run "make createdb"
 
-
+7- Run "make migrateup"
 
 To run the server: "make server"
