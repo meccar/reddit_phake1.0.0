@@ -25,8 +25,8 @@ CREATE TABLE Post (
   picture BYTEA,
   -- username VARCHAR NOT NULL, 
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  -- FOREIGN KEY (username) REFERENCES Account (username)
 );
+  -- FOREIGN KEY (username) REFERENCES Account (username)
 
 CREATE TABLE Session (
   id uuid PRIMARY KEY,
