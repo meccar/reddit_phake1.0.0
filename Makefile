@@ -4,16 +4,16 @@ network:
 	docker network create reddit-network
 
 postgres:
-	docker run --name postgres --network reddit-network -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=1 -d postgres:16.2
+	docker run --name postgres --network reddit-network -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -d postgres:16.2
 
 mysql:
-	docker run --name mysql8 -p 3306:3306  -e MYSQL_ROOT_PASSWORD=1 -d mysql:8
+	docker run --name mysql8 -p 3306:3306  -e MYSQL_ROOT_PASSWORD=postgres -d mysql:8
 
 createdb:
 	docker exec -it postgres createdb --username=postgres reddit
 
 dropdb:
-	docker exec -it postgres dropdb reddit
+	docker exec -it postgres dropdb -U postgres reddit
 
 migrateup:
 	migrate -path db/migration -database "$(DB_URL)" -verbose up
