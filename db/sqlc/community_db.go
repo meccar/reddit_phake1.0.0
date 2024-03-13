@@ -39,3 +39,7 @@ func (h *Handlers) CreateCommunityTx(ctx context.Context, arg CreateCommunityTxP
 	})
 	return result, err
 }
+
+func (h *Handlers) getCommunityID(ctx context.Context, arg CreateCommunityTxParams) (uuid.UUID, error) {
+	return h.Queries.getCommunityIDbyName(ctx, arg.CommunityName)
+}

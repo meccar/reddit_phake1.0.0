@@ -26,6 +26,7 @@ type Querier interface {
 	getAccountRolebyUsername(ctx context.Context, username string) (string, error)
 	getAllPost(ctx context.Context) ([]Post, error)
 	getAllSessionID(ctx context.Context) ([]uuid.UUID, error)
+	getCommunityIDbyName(ctx context.Context, communityName string) (uuid.UUID, error)
 	getFormsID(ctx context.Context, id uuid.UUID) (uuid.UUID, error)
 	getSessionIDbyID(ctx context.Context, id uuid.UUID) (uuid.UUID, error)
 	loginAccount(ctx context.Context, arg loginAccountParams) (Account, error)

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	errorHandler "error"
 	db "sqlc"
 	util "util"
 
@@ -19,20 +18,13 @@ func (server *Server) communityHandler(c *gin.Context) {
 		return
 	}
 
-	// Validate the form data
-	if msgValidationResult := msg.ValidateForm(); msgValidationResult != nil {
-		status := errorHandler.StatusHandler(msgValidationResult)
-		c.AbortWithStatusJSON(status, errorResponse(msgValidationResult))
-		return
-	}
-
 	// Submit the form to the database
 	submit, err := server.DbHandler.CreateCommunityTx(c.Request.Context(), *msg)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	fmt.println("communityHandler submit: ", submit)
+	fmt.Println("communityHandler submit: ", submit)
 	// msg.ID = submit.Community.ID
 
 	// Return a success response with the submitted form data

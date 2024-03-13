@@ -2,9 +2,9 @@ package db
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
-	"errors"
 
 	util "util"
 
@@ -54,7 +54,7 @@ func (h *Handlers) CreateAccountTx(ctx context.Context, arg CreateAccountTxParam
 
 	err := h.execTx(ctx, func(q *Queries) error {
 		// Submit the account to the database
-		if _, err := h.Queries.authUsername(ctx, arg.Username); err == nil {
+		if _, err := q.authUsername(ctx, arg.Username); err == nil {
 			return fmt.Errorf("Email is already registered")
 		}
 
@@ -67,8 +67,7 @@ func (h *Handlers) CreateAccountTx(ctx context.Context, arg CreateAccountTxParam
 			Password: arg.Password,
 		}
 
-		Account, err := h.Queries.createAccount(ctx, params)
-
+		Account, err := q.createAccount(ctx, params)
 		if err != nil {
 			return err
 		}

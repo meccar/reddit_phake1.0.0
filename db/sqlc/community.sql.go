@@ -39,3 +39,17 @@ func (q *Queries) createCommunity(ctx context.Context, arg createCommunityParams
 	)
 	return i, err
 }
+
+const getCommunityIDbyName = `-- name: getCommunityIDbyName :one
+SELECT id
+FROM Community
+WHERE community_name = $1
+LIMIT 1
+`
+
+func (q *Queries) getCommunityIDbyName(ctx context.Context, communityName string) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, getCommunityIDbyName, communityName)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
+}
