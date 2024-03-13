@@ -4,9 +4,12 @@ INSERT INTO Post (
   title,
   article,
   picture,
+  user_id,
+  community_id,
+  upvotes,
   created_at
 ) VALUES (
-  $1,$2,$3,$4,CURRENT_TIMESTAMP
+  $1,$2,$3,$4,$5,$6,$7,CURRENT_TIMESTAMP
 ) RETURNING *;
 
 -- name: getAllPost :many

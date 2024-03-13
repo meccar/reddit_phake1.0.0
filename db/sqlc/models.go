@@ -5,64 +5,36 @@
 package db
 
 import (
-	"database/sql/driver"
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type Userrole string
-
-const (
-	UserroleGuest Userrole = "guest"
-	UserroleUser  Userrole = "user"
-	UserroleAdmin Userrole = "admin"
-)
-
-func (e *Userrole) Scan(src interface{}) error {
-	switch s := src.(type) {
-	case []byte:
-		*e = Userrole(s)
-	case string:
-		*e = Userrole(s)
-	default:
-		return fmt.Errorf("unsupported scan type for Userrole: %T", src)
-	}
-	return nil
-}
-
-type NullUserrole struct {
-	Userrole Userrole `json:"userrole"`
-	Valid    bool     `json:"valid"` // Valid is true if Userrole is not NULL
-}
-
-// Scan implements the Scanner interface.
-func (ns *NullUserrole) Scan(value interface{}) error {
-	if value == nil {
-		ns.Userrole, ns.Valid = "", false
-		return nil
-	}
-	ns.Valid = true
-	return ns.Userrole.Scan(value)
-}
-
-// Value implements the driver Valuer interface.
-func (ns NullUserrole) Value() (driver.Value, error) {
-	if !ns.Valid {
-		return nil, nil
-	}
-	return string(ns.Userrole), nil
-}
-
 type Account struct {
 	ID              uuid.UUID `json:"id"`
-	Role            Userrole  `json:"role"`
+	Role            string    `json:"role"`
 	Username        string    `json:"username"`
 	Password        string    `json:"password"`
+	Photo           []byte    `json:"photo"`
 	IsEmailVerified bool      `json:"is_email_verified"`
 	CreatedAt       time.Time `json:"created_at"`
+}
+
+type Comment struct {
+	ID        uuid.UUID `json:"id"`
+	PostID    uuid.UUID `json:"post_id"`
+	UserID    uuid.UUID `json:"user_id"`
+	Text      string    `json:"text"`
+	Upvotes   int32     `json:"upvotes"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+type Community struct {
+	ID            uuid.UUID `json:"id"`
+	CommunityName string    `json:"community_name"`
+	Photo         []byte    `json:"photo"`
+	CreatedAt     time.Time `json:"created_at"`
 }
 
 type Form struct {
@@ -74,10 +46,22 @@ type Form struct {
 }
 
 type Post struct {
+	ID          uuid.UUID `json:"id"`
+	Title       string    `json:"title"`
+	Article     string    `json:"article"`
+	Picture     []byte    `json:"picture"`
+	UserID      uuid.UUID `json:"user_id"`
+	CommunityID uuid.UUID `json:"community_id"`
+	Upvotes     int32     `json:"upvotes"`
+	CreatedAt   time.Time `json:"created_at"`
+}
+
+type Reply struct {
 	ID        uuid.UUID `json:"id"`
-	Title     string    `json:"title"`
-	Article   string    `json:"article"`
-	Picture   []byte    `json:"picture"`
+	CommentID uuid.UUID `json:"comment_id"`
+	UserID    uuid.UUID `json:"user_id"`
+	Text      string    `json:"text"`
+	Upvotes   int32     `json:"upvotes"`
 	CreatedAt time.Time `json:"created_at"`
 }
 

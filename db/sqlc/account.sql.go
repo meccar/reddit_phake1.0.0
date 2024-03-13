@@ -21,7 +21,7 @@ SET
   is_email_verified = COALESCE($2, is_email_verified)
 WHERE
   username = $3
-RETURNING id, role, username, password, is_email_verified, created_at
+RETURNING id, role, username, password, photo, is_email_verified, created_at
 `
 
 type UpdateAccountParams struct {
@@ -38,6 +38,7 @@ func (q *Queries) UpdateAccount(ctx context.Context, arg UpdateAccountParams) (A
 		&i.Role,
 		&i.Username,
 		&i.Password,
+		&i.Photo,
 		&i.IsEmailVerified,
 		&i.CreatedAt,
 	)
@@ -81,14 +82,14 @@ INSERT INTO Account (
   created_at
 ) VALUES (
   $1,$2,$3,$4,CURRENT_TIMESTAMP
-) RETURNING id, role, username, password, is_email_verified, created_at
+) RETURNING id, role, username, password, photo, is_email_verified, created_at
 `
 
 type createAccountParams struct {
 	ID       uuid.UUID `json:"id"`
 	Username string    `json:"username"`
 	Password string    `json:"password"`
-	Role     Userrole  `json:"role"`
+	Role     string    `json:"role"`
 }
 
 func (q *Queries) createAccount(ctx context.Context, arg createAccountParams) (Account, error) {
@@ -104,6 +105,7 @@ func (q *Queries) createAccount(ctx context.Context, arg createAccountParams) (A
 		&i.Role,
 		&i.Username,
 		&i.Password,
+		&i.Photo,
 		&i.IsEmailVerified,
 		&i.CreatedAt,
 	)
@@ -144,9 +146,9 @@ WHERE username = $1
 LIMIT 1
 `
 
-func (q *Queries) getAccountRolebyUsername(ctx context.Context, username string) (Userrole, error) {
+func (q *Queries) getAccountRolebyUsername(ctx context.Context, username string) (string, error) {
 	row := q.db.QueryRow(ctx, getAccountRolebyUsername, username)
-	var role Userrole
+	var role string
 	err := row.Scan(&role)
 	return role, err
 }
@@ -159,7 +161,7 @@ INSERT INTO Account (
   created_at
 ) VALUES (
   $1,$2,$3,CURRENT_TIMESTAMP
-) RETURNING id, role, username, password, is_email_verified, created_at
+) RETURNING id, role, username, password, photo, is_email_verified, created_at
 `
 
 type loginAccountParams struct {
@@ -176,6 +178,7 @@ func (q *Queries) loginAccount(ctx context.Context, arg loginAccountParams) (Acc
 		&i.Role,
 		&i.Username,
 		&i.Password,
+		&i.Photo,
 		&i.IsEmailVerified,
 		&i.CreatedAt,
 	)

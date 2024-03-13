@@ -17,17 +17,23 @@ INSERT INTO Post (
   title,
   article,
   picture,
+  user_id,
+  community_id,
+  upvotes,
   created_at
 ) VALUES (
-  $1,$2,$3,$4,CURRENT_TIMESTAMP
-) RETURNING id, title, article, picture, created_at
+  $1,$2,$3,$4,$5,$6,$7,CURRENT_TIMESTAMP
+) RETURNING id, title, article, picture, user_id, community_id, upvotes, created_at
 `
 
 type createPostParams struct {
-	ID      uuid.UUID `json:"id"`
-	Title   string    `json:"title"`
-	Article string    `json:"article"`
-	Picture []byte    `json:"picture"`
+	ID          uuid.UUID `json:"id"`
+	Title       string    `json:"title"`
+	Article     string    `json:"article"`
+	Picture     []byte    `json:"picture"`
+	UserID      uuid.UUID `json:"user_id"`
+	CommunityID uuid.UUID `json:"community_id"`
+	Upvotes     int32     `json:"upvotes"`
 }
 
 func (q *Queries) createPost(ctx context.Context, arg createPostParams) (Post, error) {
@@ -36,6 +42,9 @@ func (q *Queries) createPost(ctx context.Context, arg createPostParams) (Post, e
 		arg.Title,
 		arg.Article,
 		arg.Picture,
+		arg.UserID,
+		arg.CommunityID,
+		arg.Upvotes,
 	)
 	var i Post
 	err := row.Scan(
@@ -43,13 +52,16 @@ func (q *Queries) createPost(ctx context.Context, arg createPostParams) (Post, e
 		&i.Title,
 		&i.Article,
 		&i.Picture,
+		&i.UserID,
+		&i.CommunityID,
+		&i.Upvotes,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getAllPost = `-- name: getAllPost :many
-SELECT id, title, article, picture, created_at
+SELECT id, title, article, picture, user_id, community_id, upvotes, created_at
 FROM Post
 `
 
@@ -67,6 +79,9 @@ func (q *Queries) getAllPost(ctx context.Context) ([]Post, error) {
 			&i.Title,
 			&i.Article,
 			&i.Picture,
+			&i.UserID,
+			&i.CommunityID,
+			&i.Upvotes,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err

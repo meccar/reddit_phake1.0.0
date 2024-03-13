@@ -22,7 +22,7 @@ type Querier interface {
 	deleteSession(ctx context.Context, username string) error
 	getAccountIDbyID(ctx context.Context, id uuid.UUID) (uuid.UUID, error)
 	getAccountIDbyUsername(ctx context.Context, username string) (uuid.UUID, error)
-	getAccountRolebyUsername(ctx context.Context, username string) (Userrole, error)
+	getAccountRolebyUsername(ctx context.Context, username string) (string, error)
 	getAllPost(ctx context.Context) ([]Post, error)
 	getAllSessionID(ctx context.Context) ([]uuid.UUID, error)
 	getFormsID(ctx context.Context, id uuid.UUID) (uuid.UUID, error)

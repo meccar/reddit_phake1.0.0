@@ -3,7 +3,7 @@ CREATE TABLE Account (
   role VARCHAR NOT NULL,
   username VARCHAR NOT NULL,
   password VARCHAR NOT NULL,
-  photo bytea,
+  photo bytea DEFAULT './public/image/profile-picture.jpeg',
   is_email_verified bool NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
