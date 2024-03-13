@@ -14,7 +14,7 @@ type CreateReplyTxResult struct {
 	Reply *Reply
 }
 
-func (h *Handlers) createReplyTx(ctx context.Context, arg CreateReplyTxParams) (CreateReplyTxResult, error) {
+func (h *Handlers) CreateReplyTx(ctx context.Context, arg CreateReplyTxParams) (CreateReplyTxResult, error) {
 	var result CreateReplyTxResult
 
 	err := h.execTx(ctx, func(q *Queries) error {

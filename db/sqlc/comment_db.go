@@ -14,7 +14,7 @@ type CreateCommentTxResult struct {
 	Comment *Comment
 }
 
-func (h *Handlers) createCommentTx(ctx context.Context, arg CreateCommentTxParams) (CreateCommentTxResult, error) {
+func (h *Handlers) CreateCommentTx(ctx context.Context, arg CreateCommentTxParams) (CreateCommentTxResult, error) {
 	var result CreateCommentTxResult
 
 	err := h.execTx(ctx, func(q *Queries) error {
