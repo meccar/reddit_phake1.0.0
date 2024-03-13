@@ -40,6 +40,6 @@ func (h *Handlers) CreateCommunityTx(ctx context.Context, arg CreateCommunityTxP
 	return result, err
 }
 
-func (h *Handlers) getCommunityID(ctx context.Context, arg CreateCommunityTxParams) (uuid.UUID, error) {
-	return h.Queries.getCommunityIDbyName(ctx, arg.CommunityName)
+func (h *Handlers) SearchCommunity(ctx context.Context, communityName string) (uuid.UUID, error) {
+	return h.Queries.searchCommunityName(ctx, communityName)
 }

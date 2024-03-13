@@ -8,8 +8,7 @@ INSERT INTO Community (
   $1,$2,$3,CURRENT_TIMESTAMP
 ) RETURNING *;
 
--- name: getCommunityIDbyName :one
-SELECT id
+-- name: searchCommunityName :many
+SELECT id, community_name
 FROM Community
-WHERE community_name = $1
-LIMIT 1;
+WHERE community_name like $1;

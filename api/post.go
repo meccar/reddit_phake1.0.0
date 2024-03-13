@@ -7,6 +7,7 @@ import (
 	util "util"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func (server *Server) postHandler(c *gin.Context) {
@@ -15,7 +16,21 @@ func (server *Server) postHandler(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	
+	// msg.UserID = c.GetHeader("id")
+	id := c.GetHeader("id")
+
+	// Parse the string value into a UUID
+	msg.UserID, err = uuid.Parse(id)
+	if err != nil {
+		// Handle error if the string is not a valid UUID
+	}
+
+	// msg.CommunityID, err = server.DbHandler.SearchCommunity(c.Request.Context(), *msg)
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
+	// 	return
+	// }
+
 	if submit, err := server.DbHandler.CreatePostTx(c.Request.Context(), *msg); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 		return

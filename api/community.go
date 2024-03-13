@@ -24,6 +24,7 @@ func (server *Server) communityHandler(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+
 	fmt.Println("communityHandler submit: ", submit)
 	// msg.ID = submit.Community.ID
 
@@ -31,8 +32,8 @@ func (server *Server) communityHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, msg)
 }
 
-func communityForm(r *http.Request) (*db.SubmitFormTxParams, error) {
-	msg := &db.SubmitFormTxParams{}
+func communityForm(r *http.Request) (*db.CreateCommunityTxParams, error) {
+	msg := &db.CreateCommunityTxParams{}
 	err := util.ParseForm(r, msg)
 	return msg, err
 }
