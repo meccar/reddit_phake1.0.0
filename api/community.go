@@ -39,7 +39,7 @@ func communityForm(r *http.Request) (*db.CreateCommunityTxParams, error) {
 }
 
 func (server *Server) SearchKeyCommunity(c *gin.Context) ([]db.SearchCommunityNameRow, error) {
-	searchQuery := c.Query("q")
+	searchQuery := c.Query("community")
 	fmt.Println("SearchCommunity searchQuery: ", searchQuery)
 	data, err := server.DbHandler.SearchCommunity(c.Request.Context(), searchQuery)
 	if err != nil {

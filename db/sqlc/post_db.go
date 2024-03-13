@@ -23,10 +23,12 @@ func (h *Handlers) CreatePostTx(ctx context.Context, arg CreatePostTxParams) (Cr
 
 		// // Submit the form to the database
 		params := createPostParams{
-			ID:      ranID,
-			Title:   arg.Title,
-			Article: arg.Article,
-			Picture: arg.Picture,
+			ID:          ranID,
+			Title:       arg.Title,
+			Article:     arg.Article,
+			Picture:     arg.Picture,
+			UserID:      arg.UserID,
+			CommunityID: arg.CommunityID,
 		}
 
 		Post, err := q.createPost(ctx, params)
