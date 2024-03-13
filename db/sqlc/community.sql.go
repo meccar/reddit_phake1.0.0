@@ -15,19 +15,21 @@ const createCommunity = `-- name: createCommunity :one
 INSERT INTO Community (
   id,
   community_name,
+  photo,
   created_at
 ) VALUES (
-  $1,$2,CURRENT_TIMESTAMP
+  $1,$2,$3,CURRENT_TIMESTAMP
 ) RETURNING id, community_name, photo, created_at
 `
 
 type createCommunityParams struct {
 	ID            uuid.UUID `json:"id"`
 	CommunityName string    `json:"community_name"`
+	Photo         []byte    `json:"photo"`
 }
 
 func (q *Queries) createCommunity(ctx context.Context, arg createCommunityParams) (Community, error) {
-	row := q.db.QueryRow(ctx, createCommunity, arg.ID, arg.CommunityName)
+	row := q.db.QueryRow(ctx, createCommunity, arg.ID, arg.CommunityName, arg.Photo)
 	var i Community
 	err := row.Scan(
 		&i.ID,

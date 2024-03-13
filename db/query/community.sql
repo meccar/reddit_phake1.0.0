@@ -2,7 +2,8 @@
 INSERT INTO Community (
   id,
   community_name,
+  photo,
   created_at
 ) VALUES (
-  $1,$2,CURRENT_TIMESTAMP
+  $1,$2,$3,CURRENT_TIMESTAMP
 ) RETURNING *;
