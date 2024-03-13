@@ -11,6 +11,37 @@ import (
 	"github.com/google/uuid"
 )
 
+const searchCommunityName = `-- name: SearchCommunityName :many
+SELECT id, community_name
+FROM Community
+WHERE community_name like $1
+`
+
+type SearchCommunityNameRow struct {
+	ID            uuid.UUID `json:"id"`
+	CommunityName string    `json:"community_name"`
+}
+
+func (q *Queries) SearchCommunityName(ctx context.Context, communityName string) ([]SearchCommunityNameRow, error) {
+	rows, err := q.db.Query(ctx, searchCommunityName, communityName)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []SearchCommunityNameRow{}
+	for rows.Next() {
+		var i SearchCommunityNameRow
+		if err := rows.Scan(&i.ID, &i.CommunityName); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const createCommunity = `-- name: createCommunity :one
 INSERT INTO Community (
   id,
@@ -38,35 +69,4 @@ func (q *Queries) createCommunity(ctx context.Context, arg createCommunityParams
 		&i.CreatedAt,
 	)
 	return i, err
-}
-
-const searchCommunityName = `-- name: searchCommunityName :many
-SELECT id, community_name
-FROM Community
-WHERE community_name like $1
-`
-
-type searchCommunityNameRow struct {
-	ID            uuid.UUID `json:"id"`
-	CommunityName string    `json:"community_name"`
-}
-
-func (q *Queries) searchCommunityName(ctx context.Context, communityName string) ([]searchCommunityNameRow, error) {
-	rows, err := q.db.Query(ctx, searchCommunityName, communityName)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []searchCommunityNameRow{}
-	for rows.Next() {
-		var i searchCommunityNameRow
-		if err := rows.Scan(&i.ID, &i.CommunityName); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
 }

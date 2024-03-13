@@ -12,6 +12,7 @@ import (
 
 type Querier interface {
 	CreateVerifyEmail(ctx context.Context, arg CreateVerifyEmailParams) (VerifyEmail, error)
+	SearchCommunityName(ctx context.Context, communityName string) ([]SearchCommunityNameRow, error)
 	UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error)
 	UpdateVerifyEmail(ctx context.Context, arg UpdateVerifyEmailParams) (VerifyEmail, error)
 	authPassword(ctx context.Context, username string) (string, error)
@@ -29,7 +30,6 @@ type Querier interface {
 	getFormsID(ctx context.Context, id uuid.UUID) (uuid.UUID, error)
 	getSessionIDbyID(ctx context.Context, id uuid.UUID) (uuid.UUID, error)
 	loginAccount(ctx context.Context, arg loginAccountParams) (Account, error)
-	searchCommunityName(ctx context.Context, communityName string) ([]searchCommunityNameRow, error)
 	submitForm(ctx context.Context, arg submitFormParams) (Form, error)
 }
 

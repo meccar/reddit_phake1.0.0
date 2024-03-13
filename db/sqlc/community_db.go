@@ -40,6 +40,6 @@ func (h *Handlers) CreateCommunityTx(ctx context.Context, arg CreateCommunityTxP
 	return result, err
 }
 
-func (h *Handlers) SearchCommunity(ctx context.Context, communityName string) ([]searchCommunityNameRow, error) {
-	return h.Queries.searchCommunityName(ctx, communityName)
+func (h *Handlers) SearchCommunity(ctx context.Context, communityName string) ([]SearchCommunityNameRow, error) {
+	return h.Queries.SearchCommunityName(ctx, communityName)
 }

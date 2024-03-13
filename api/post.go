@@ -25,11 +25,12 @@ func (server *Server) postHandler(c *gin.Context) {
 		// Handle error if the string is not a valid UUID
 	}
 
-	// msg.CommunityID, err = server.DbHandler.SearchCommunity(c.Request.Context(), *msg)
-	// if err != nil {
-	// 	c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
-	// 	return
-	// }
+	communityResult, err := server.SearchKeyCommunity(c)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	msg.CommunityID = communityResult[0].ID
 
 	if submit, err := server.DbHandler.CreatePostTx(c.Request.Context(), *msg); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))

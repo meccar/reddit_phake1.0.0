@@ -37,3 +37,16 @@ func communityForm(r *http.Request) (*db.CreateCommunityTxParams, error) {
 	err := util.ParseForm(r, msg)
 	return msg, err
 }
+
+func (server *Server) SearchKeyCommunity(c *gin.Context) ([]db.SearchCommunityNameRow, error) {
+	searchQuery := c.Query("q")
+	fmt.Println("SearchCommunity searchQuery: ", searchQuery)
+	data, err := server.DbHandler.SearchCommunity(c.Request.Context(), searchQuery)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
+		return nil, err
+	}
+
+	return data, nil
+	// c.JSON(http.StatusOK, data)
+}
