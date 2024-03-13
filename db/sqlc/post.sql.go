@@ -19,10 +19,9 @@ INSERT INTO Post (
   picture,
   user_id,
   community_id,
-  upvotes,
   created_at
 ) VALUES (
-  $1,$2,$3,$4,$5,$6,$7,CURRENT_TIMESTAMP
+  $1,$2,$3,$4,$5,$6,CURRENT_TIMESTAMP
 ) RETURNING id, title, article, picture, user_id, community_id, upvotes, created_at
 `
 
@@ -33,7 +32,6 @@ type createPostParams struct {
 	Picture     []byte    `json:"picture"`
 	UserID      uuid.UUID `json:"user_id"`
 	CommunityID uuid.UUID `json:"community_id"`
-	Upvotes     int32     `json:"upvotes"`
 }
 
 func (q *Queries) createPost(ctx context.Context, arg createPostParams) (Post, error) {
@@ -44,7 +42,6 @@ func (q *Queries) createPost(ctx context.Context, arg createPostParams) (Post, e
 		arg.Picture,
 		arg.UserID,
 		arg.CommunityID,
-		arg.Upvotes,
 	)
 	var i Post
 	err := row.Scan(

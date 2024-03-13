@@ -17,6 +17,7 @@ type Querier interface {
 	authPassword(ctx context.Context, username string) (string, error)
 	authUsername(ctx context.Context, username string) (string, error)
 	createAccount(ctx context.Context, arg createAccountParams) (Account, error)
+	createCommunity(ctx context.Context, arg createCommunityParams) (Community, error)
 	createPost(ctx context.Context, arg createPostParams) (Post, error)
 	createSession(ctx context.Context, arg createSessionParams) (Session, error)
 	deleteSession(ctx context.Context, username string) error
