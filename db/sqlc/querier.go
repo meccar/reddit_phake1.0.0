@@ -18,8 +18,10 @@ type Querier interface {
 	authPassword(ctx context.Context, username string) (string, error)
 	authUsername(ctx context.Context, username string) (string, error)
 	createAccount(ctx context.Context, arg createAccountParams) (Account, error)
+	createComment(ctx context.Context, arg createCommentParams) (Comment, error)
 	createCommunity(ctx context.Context, arg createCommunityParams) (Community, error)
 	createPost(ctx context.Context, arg createPostParams) (Post, error)
+	createReply(ctx context.Context, arg createReplyParams) (Reply, error)
 	createSession(ctx context.Context, arg createSessionParams) (Session, error)
 	deleteSession(ctx context.Context, username string) error
 	getAccountIDbyID(ctx context.Context, id uuid.UUID) (uuid.UUID, error)
