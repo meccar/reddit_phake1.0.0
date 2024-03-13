@@ -3,6 +3,7 @@ CREATE TABLE Account (
   role VARCHAR NOT NULL,
   username VARCHAR NOT NULL,
   password VARCHAR NOT NULL,
+  photo bytea,
   is_email_verified bool NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -23,9 +24,14 @@ CREATE TABLE Post (
   title VARCHAR NOT NULL,
   article TEXT NOT NULL,
   picture BYTEA,
+  user_id uuid NOT NULL,
+  community_id uuid NOT NULL,
+  upvotes INT NOT NULL,
   -- username VARCHAR NOT NULL, 
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+
   -- FOREIGN KEY (username) REFERENCES Account (username)
 
 CREATE TABLE Session (
@@ -35,6 +41,31 @@ CREATE TABLE Session (
   expires_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (username) REFERENCES Account(username)
+);
+
+CREATE TABLE Comment (
+  id uuid PRIMARY KEY,
+  post_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  text text NOT NULL,
+  upvotes int NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Reply (
+  id uuid PRIMARY KEY,
+  comment_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  text text NOT NULL,
+  upvotes INT NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Community (
+  id uuid PRIMARY KEY,
+  community_name varchar NOT NULL,
+  photo bytea NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Verify_email (
@@ -49,4 +80,11 @@ CREATE TABLE Verify_email (
 ALTER TABLE Verify_email ADD FOREIGN KEY (username) REFERENCES Account (username);
 
 -- Added foreign key constraint to Post table
--- ALTER TABLE Post ADD FOREIGN KEY (username) REFERENCES Account (username);
+ALTER TABLE Post ADD FOREIGN KEY (username) REFERENCES Account (username);
+
+ALTER TABLE Post ADD FOREIGN KEY (user_id) REFERENCES Account (id);
+ALTER TABLE Post ADD FOREIGN KEY (community_id) REFERENCES Community (id);
+ALTER TABLE Comment ADD FOREIGN KEY (post_id) REFERENCES Post (id);
+ALTER TABLE Comment ADD FOREIGN KEY (user_id) REFERENCES Account (id);
+ALTER TABLE Reply ADD FOREIGN KEY (comment_id) REFERENCES Comment (id);
+ALTER TABLE Reply ADD FOREIGN KEY (user_id) REFERENCES Account (id);
