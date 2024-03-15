@@ -13,6 +13,7 @@ import (
 type Querier interface {
 	CreateVerifyEmail(ctx context.Context, arg CreateVerifyEmailParams) (VerifyEmail, error)
 	GetAllPost(ctx context.Context) ([]Post, error)
+	GetCommunityIDbyName(ctx context.Context, communityName string) (uuid.UUID, error)
 	GetCommunitybyID(ctx context.Context, id uuid.UUID) ([]Community, error)
 	SearchCommunityName(ctx context.Context, communityName string) ([]SearchCommunityNameRow, error)
 	UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error)

@@ -8,6 +8,7 @@ import (
 
 type CreatePostTxParams struct {
 	createPostParams
+	CommunityName string
 }
 
 type CreatePostTxResult struct {

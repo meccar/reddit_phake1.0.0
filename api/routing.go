@@ -24,7 +24,8 @@ func (server *Server) SetupRoutes() {
 
 	communityRoutes := server.Router.Group("r/community")
 	communityRoutes.GET("/", GetHandler("community"))
-	communityRoutes.GET("/:community/:post_id/:post", server.handlerWrapper(server.CommunityHandler))
+	// communityRoutes.GET("/", server.handlerWrapper(server.postHandler))
+	// communityRoutes.GET("/:community/:post_id/:post", server.handlerWrapper(server.postHandler))
 
 	// Route grouping for authenticated routes
 	authRoutes := server.Router.Group("/")
@@ -72,7 +73,8 @@ func (server *Server) SetupRoutes() {
 		apiRoutes.POST("/login", server.handlerWrapper(server.loginHandler))
 		apiRoutes.POST("/post", server.handlerWrapper(server.CreatePost))
 		apiRoutes.POST("/logout", server.handlerWrapper(server.logoutHandler))
-		apiRoutes.GET("/tintuc", server.handleNews)
+
+		apiRoutes.GET("/posts", server.handlerWrapper(server.postHandler))
 
 	}
 

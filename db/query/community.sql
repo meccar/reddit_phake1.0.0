@@ -13,6 +13,10 @@ SELECT id, community_name
 FROM Community
 WHERE community_name like $1;
 
+-- name: GetCommunityIDbyName :one
+SELECT id FROM Community
+WHERE community_name = $1;
+
 -- name: GetCommunitybyID :many
 SELECT * FROM Community
 WHERE id = $1;

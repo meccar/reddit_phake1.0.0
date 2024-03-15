@@ -11,6 +11,18 @@ import (
 	"github.com/google/uuid"
 )
 
+const getCommunityIDbyName = `-- name: GetCommunityIDbyName :one
+SELECT id FROM Community
+WHERE community_name = $1
+`
+
+func (q *Queries) GetCommunityIDbyName(ctx context.Context, communityName string) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, getCommunityIDbyName, communityName)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
+}
+
 const getCommunitybyID = `-- name: GetCommunitybyID :many
 SELECT id, community_name, photo, created_at FROM Community
 WHERE id = $1

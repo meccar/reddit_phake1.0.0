@@ -64,7 +64,7 @@ CREATE TABLE Reply (
 CREATE TABLE Community (
   id uuid PRIMARY KEY,
   community_name varchar NOT NULL,
-  photo bytea NOT NULL DEFAULT './public/image/community-picture.jpeg',
+  photo bytea DEFAULT './public/image/community-picture.jpeg',
   created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
