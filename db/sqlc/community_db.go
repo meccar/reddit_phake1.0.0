@@ -43,3 +43,7 @@ func (h *Handlers) CreateCommunityTx(ctx context.Context, arg CreateCommunityTxP
 func (h *Handlers) SearchCommunity(ctx context.Context, communityName string) ([]SearchCommunityNameRow, error) {
 	return h.Queries.SearchCommunityName(ctx, communityName)
 }
+
+func (h *Handlers) GetCommunitybyID(ctx context.Context, id uuid.UUID) ([]Community, error) {
+	return h.Queries.GetCommunitybyID(ctx, id)
+}

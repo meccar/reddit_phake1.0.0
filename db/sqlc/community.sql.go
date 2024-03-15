@@ -11,6 +11,36 @@ import (
 	"github.com/google/uuid"
 )
 
+const getCommunitybyID = `-- name: GetCommunitybyID :many
+SELECT id, community_name, photo, created_at FROM Community
+WHERE id = $1
+`
+
+func (q *Queries) GetCommunitybyID(ctx context.Context, id uuid.UUID) ([]Community, error) {
+	rows, err := q.db.Query(ctx, getCommunitybyID, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Community{}
+	for rows.Next() {
+		var i Community
+		if err := rows.Scan(
+			&i.ID,
+			&i.CommunityName,
+			&i.Photo,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const searchCommunityName = `-- name: SearchCommunityName :many
 SELECT id, community_name
 FROM Community

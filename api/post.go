@@ -11,6 +11,22 @@ import (
 )
 
 func (server *Server) postHandler(c *gin.Context) {
+	posts, err := server.DbHandler.GetAllPosts(c.Request.Context())
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	community, err := server.DbHandler.GetCommunitybyID(c.Request.Context(), posts.CommunityID)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, posts)
+}
+
+func (server *Server) CreatePost(c *gin.Context) {
 	msg, err := postForm(c.Request)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))

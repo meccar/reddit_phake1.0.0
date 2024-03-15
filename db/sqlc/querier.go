@@ -12,6 +12,8 @@ import (
 
 type Querier interface {
 	CreateVerifyEmail(ctx context.Context, arg CreateVerifyEmailParams) (VerifyEmail, error)
+	GetAllPost(ctx context.Context) ([]Post, error)
+	GetCommunitybyID(ctx context.Context, id uuid.UUID) ([]Community, error)
 	SearchCommunityName(ctx context.Context, communityName string) ([]SearchCommunityNameRow, error)
 	UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error)
 	UpdateVerifyEmail(ctx context.Context, arg UpdateVerifyEmailParams) (VerifyEmail, error)
@@ -27,7 +29,6 @@ type Querier interface {
 	getAccountIDbyID(ctx context.Context, id uuid.UUID) (uuid.UUID, error)
 	getAccountIDbyUsername(ctx context.Context, username string) (uuid.UUID, error)
 	getAccountRolebyUsername(ctx context.Context, username string) (string, error)
-	getAllPost(ctx context.Context) ([]Post, error)
 	getAllSessionID(ctx context.Context) ([]uuid.UUID, error)
 	getFormsID(ctx context.Context, id uuid.UUID) (uuid.UUID, error)
 	getSessionIDbyID(ctx context.Context, id uuid.UUID) (uuid.UUID, error)

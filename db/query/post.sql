@@ -11,6 +11,6 @@ INSERT INTO Post (
   $1,$2,$3,$4,$5,$6,CURRENT_TIMESTAMP
 ) RETURNING *;
 
--- name: getAllPost :many
-SELECT *
-FROM Post;
+-- name: GetAllPost :many
+SELECT * FROM Post
+ORDER BY created_at DESC;

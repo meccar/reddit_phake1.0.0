@@ -12,3 +12,11 @@ INSERT INTO Community (
 SELECT id, community_name
 FROM Community
 WHERE community_name like $1;
+
+-- name: GetCommunitybyID :many
+SELECT * FROM Community
+WHERE id = $1;
+
+-- -- name: GetAllCommunity :many
+-- SELECT * FROM Community
+-- ORDER BY created_at DESC;

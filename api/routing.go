@@ -2,11 +2,10 @@ package api
 
 import (
 	"net/http"
-	
+
 	jwtauth "token"
 
 	"github.com/gin-gonic/gin"
-
 )
 
 func (server *Server) SetupRoutes() {
@@ -21,8 +20,11 @@ func (server *Server) SetupRoutes() {
 	server.Router.GET("/register", GetHandler("register"))
 	server.Router.GET("/", GetHandler("home"))
 	server.Router.GET("/thankyou", GetHandler("thankyou"))
-	server.Router.GET("/tintuc", GetHandler("tintuc"))
 	server.Router.GET("/login", GetHandler("login"))
+
+	communityRoutes := server.Router.Group("r/community")
+	communityRoutes.GET("/", GetHandler("community"))
+	communityRoutes.GET("/:community/:post_id/:post", server.handlerWrapper(server.CommunityHandler))
 
 	// Route grouping for authenticated routes
 	authRoutes := server.Router.Group("/")
@@ -44,7 +46,7 @@ func (server *Server) SetupRoutes() {
 		// jwtauth.VerifyPaseto(*http.Request),
 
 		jwtauth.Authenticator(server.TokenAuthRS256),
-	    // func(c *gin.Context) {
+		// func(c *gin.Context) {
 		// 	fmt.Println("\n <<< After Authenticator")
 		// },
 
@@ -68,19 +70,14 @@ func (server *Server) SetupRoutes() {
 		apiRoutes.POST("/register", server.handlerWrapper(server.registerHandler))
 		apiRoutes.GET("/verify_email", server.handlerWrapper(server.VerifyEmailHandler))
 		apiRoutes.POST("/login", server.handlerWrapper(server.loginHandler))
-		apiRoutes.POST("/post", server.handlerWrapper(server.postHandler))
+		apiRoutes.POST("/post", server.handlerWrapper(server.CreatePost))
 		apiRoutes.POST("/logout", server.handlerWrapper(server.logoutHandler))
 		apiRoutes.GET("/tintuc", server.handleNews)
 
 	}
-	
+
 	// No route handler
 	server.Router.NoRoute(func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/")
 	})
 }
-
-
-
-
-

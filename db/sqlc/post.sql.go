@@ -11,6 +11,40 @@ import (
 	"github.com/google/uuid"
 )
 
+const getAllPost = `-- name: GetAllPost :many
+SELECT id, title, article, picture, user_id, community_id, upvotes, created_at FROM Post
+ORDER BY created_at DESC
+`
+
+func (q *Queries) GetAllPost(ctx context.Context) ([]Post, error) {
+	rows, err := q.db.Query(ctx, getAllPost)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Post{}
+	for rows.Next() {
+		var i Post
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Article,
+			&i.Picture,
+			&i.UserID,
+			&i.CommunityID,
+			&i.Upvotes,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const createPost = `-- name: createPost :one
 INSERT INTO Post (
   id,
@@ -55,38 +89,4 @@ func (q *Queries) createPost(ctx context.Context, arg createPostParams) (Post, e
 		&i.CreatedAt,
 	)
 	return i, err
-}
-
-const getAllPost = `-- name: getAllPost :many
-SELECT id, title, article, picture, user_id, community_id, upvotes, created_at
-FROM Post
-`
-
-func (q *Queries) getAllPost(ctx context.Context) ([]Post, error) {
-	rows, err := q.db.Query(ctx, getAllPost)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []Post{}
-	for rows.Next() {
-		var i Post
-		if err := rows.Scan(
-			&i.ID,
-			&i.Title,
-			&i.Article,
-			&i.Picture,
-			&i.UserID,
-			&i.CommunityID,
-			&i.Upvotes,
-			&i.CreatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
 }

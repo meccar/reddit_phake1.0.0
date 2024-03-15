@@ -43,6 +43,6 @@ func (h *Handlers) CreatePostTx(ctx context.Context, arg CreatePostTxParams) (Cr
 	return result, err
 }
 
-func (h *Handlers) GetPosts(ctx context.Context) ([]Post, error) {
-	return h.Queries.getAllPost(ctx)
+func (h *Handlers) GetAllPosts(ctx context.Context) ([]Post, error) {
+	return h.Queries.GetAllPost(ctx)
 }
