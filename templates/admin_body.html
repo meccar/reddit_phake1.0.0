@@ -1,7 +1,7 @@
 {{define "admin_body"}}
 <h1>Welcome Admin</h1>
 
-<form action="/api/v1/post" method="post">
+<form action="/api/v1/post" method="post" enctype="multipart/form-data">
     <label for="title">Tiêu đề:</label><br>
     <input type="text" id="title" name="title"><br>
 
@@ -12,10 +12,12 @@
     <textarea id="CommunityName" name="CommunityName"></textarea><br>
 
     <label for="picture">Ảnh:</label><br>
-    <input type="file" id="picture" name="picture" accept="image/*"><br>
+    <input type="text" id="picture" name="picture" placeholder="https://example.com/image.jpg"><br>
 
     <button type="submit">Đăng</button>
 </form>
+
+
 
 <!-- Logout Button -->
 <form action="/api/v1/logout" method="post">
