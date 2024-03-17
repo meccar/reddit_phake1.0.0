@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type CreateCommunityTxParams struct {
@@ -21,6 +22,10 @@ func (h *Handlers) CreateCommunityTx(ctx context.Context, arg CreateCommunityTxP
 	err := h.execTx(ctx, func(q *Queries) error {
 
 		ranID, err := uuid.NewRandom()
+
+		if len(arg.Photo.String) == 0 || arg.Photo.String == "" {
+			arg.Photo = pgtype.Text{String: "https://tafviet.com/wp-content/uploads/2024/03/community-picture.jpg"}
+		}
 
 		// // Submit the form to the database
 		params := createCommunityParams{

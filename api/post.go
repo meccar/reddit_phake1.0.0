@@ -69,10 +69,9 @@ func (server *Server) CreatePost(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	fmt.Println("\n CreatePost c before Parse: ", c)
 	fmt.Println("\n CreatePost msg before Parse: ", msg)
-	fmt.Println("\n CreatePost claim before Parse: ", claim)
-	fmt.Println("\n CreatePost claim['ID'].(string) before Parse: ", claim["ID"].(string))
+	// fmt.Println("\n CreatePost claim before Parse: ", claim)
+	// fmt.Println("\n CreatePost claim['ID'].(string) before Parse: ", claim["ID"].(string))
 
 	// Parse the string value into a UUID
 	msg.UserID, err = uuid.Parse(claim["ID"].(string))
