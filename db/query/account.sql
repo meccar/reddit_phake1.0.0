@@ -39,7 +39,7 @@ FROM Account
 WHERE id = $1
 LIMIT 1;
 
--- name: getAccountIDbyUsername :one
+-- name: GetAccountIDbyUsername :one
 SELECT id
 FROM Account
 WHERE username = $1
@@ -50,6 +50,11 @@ SELECT role
 FROM Account
 WHERE username = $1
 LIMIT 1;
+
+-- name: GetAccountbyID :many
+SELECT   id, username, photo
+FROM Account
+WHERE id = $1;
 
 -- name: UpdateAccount :one
 UPDATE Account

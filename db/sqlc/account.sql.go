@@ -12,6 +12,52 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const getAccountIDbyUsername = `-- name: GetAccountIDbyUsername :one
+SELECT id
+FROM Account
+WHERE username = $1
+LIMIT 1
+`
+
+func (q *Queries) GetAccountIDbyUsername(ctx context.Context, username string) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, getAccountIDbyUsername, username)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
+}
+
+const getAccountbyID = `-- name: GetAccountbyID :many
+SELECT   id, username, photo
+FROM Account
+WHERE id = $1
+`
+
+type GetAccountbyIDRow struct {
+	ID       uuid.UUID `json:"id"`
+	Username string    `json:"username"`
+	Photo    string    `json:"photo"`
+}
+
+func (q *Queries) GetAccountbyID(ctx context.Context, id uuid.UUID) ([]GetAccountbyIDRow, error) {
+	rows, err := q.db.Query(ctx, getAccountbyID, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetAccountbyIDRow{}
+	for rows.Next() {
+		var i GetAccountbyIDRow
+		if err := rows.Scan(&i.ID, &i.Username, &i.Photo); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateAccount = `-- name: UpdateAccount :one
 UPDATE Account
 SET
@@ -91,7 +137,7 @@ type createAccountParams struct {
 	Username string    `json:"username"`
 	Password string    `json:"password"`
 	Role     string    `json:"role"`
-	Photo    []byte    `json:"photo"`
+	Photo    string    `json:"photo"`
 }
 
 func (q *Queries) createAccount(ctx context.Context, arg createAccountParams) (Account, error) {
@@ -124,20 +170,6 @@ LIMIT 1
 
 func (q *Queries) getAccountIDbyID(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
 	row := q.db.QueryRow(ctx, getAccountIDbyID, id)
-	err := row.Scan(&id)
-	return id, err
-}
-
-const getAccountIDbyUsername = `-- name: getAccountIDbyUsername :one
-SELECT id
-FROM Account
-WHERE username = $1
-LIMIT 1
-`
-
-func (q *Queries) getAccountIDbyUsername(ctx context.Context, username string) (uuid.UUID, error) {
-	row := q.db.QueryRow(ctx, getAccountIDbyUsername, username)
-	var id uuid.UUID
 	err := row.Scan(&id)
 	return id, err
 }

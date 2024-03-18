@@ -16,7 +16,7 @@ type Account struct {
 	Role            string    `json:"role"`
 	Username        string    `json:"username"`
 	Password        string    `json:"password"`
-	Photo           []byte    `json:"photo"`
+	Photo           string    `json:"photo"`
 	IsEmailVerified bool      `json:"is_email_verified"`
 	CreatedAt       time.Time `json:"created_at"`
 }

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 
 	db "sqlc"
@@ -15,7 +14,8 @@ import (
 // Define a new struct to represent the combination of post and community details
 type postsResponse struct {
 	Post      db.Post
-	Community []db.Community // Change the field type to slice of db.Community
+	Community []db.Community
+	Account   []db.GetAccountbyIDRow
 }
 
 func (server *Server) postHandler(c *gin.Context) {
@@ -28,6 +28,7 @@ func (server *Server) postHandler(c *gin.Context) {
 
 	// Create a map to store post ID as keys and their associated communities as values
 	postCommunityMap := make(map[uuid.UUID][]db.Community)
+	postAccountMap := make(map[uuid.UUID][]db.GetAccountbyIDRow)
 
 	// Retrieve community details for each post's community ID
 	for _, post := range posts {
@@ -37,16 +38,25 @@ func (server *Server) postHandler(c *gin.Context) {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
-		// Add the community details to the map
 		postCommunityMap[post.ID] = community
+
+		account, err := server.DbHandler.GetAccountbyID(c.Request.Context(), post.UserID)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		postAccountMap[post.ID] = account
 	}
 
 	// Construct the response by combining post and community details
 	var response []postsResponse
 	for _, post := range posts {
 		community := postCommunityMap[post.ID]
+		account := postAccountMap[post.ID]
+
 		// Append post and associated community details to the response
-		response = append(response, postsResponse{Post: post, Community: community})
+		response = append(response, postsResponse{Post: post, Account: account, Community: community})
 	}
 
 	// Return the response to the client
@@ -65,26 +75,27 @@ func (server *Server) CreatePost(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	fmt.Println("\n CreatePost msg before Parse: ", msg)
-	// fmt.Println("\n CreatePost claim before Parse: ", claim)
-	// fmt.Println("\n CreatePost claim['ID'].(string) before Parse: ", claim["ID"].(string))
 
-	// Parse the string value into a UUID
-	msg.UserID, err = uuid.Parse(claim["ID"].(string))
+	msg.UserID, err = server.DbHandler.GetAccountIDbyUsername(c, claim["Username"].(string))
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	fmt.Println("\n CreatePost msg before GetCommunityIDbyName: ", msg)
+
+	// Parse the string value into a UUID
+	// msg.UserID, err = uuid.Parse(claim["ID"].(string))
+	// if err != nil {
+	// 	c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
+	// 	return
+	// }
+	// fmt.Println("\n CreatePost msg before GetCommunityIDbyName: ", msg)
 
 	msg.CommunityID, err = server.DbHandler.GetCommunityIDbyName(c, msg.CommunityName)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	fmt.Println("CreatePost msg before CreatePostTx: ", msg)
-
-	// msg.CommunityID = communityResult[0].ID
+	// fmt.Println("CreatePost msg before CreatePostTx: ", msg)
 
 	if submit, err := server.DbHandler.CreatePostTx(c.Request.Context(), *msg); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))

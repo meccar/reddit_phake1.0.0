@@ -49,7 +49,7 @@ func (h *Handlers) verifyPassword(ctx context.Context, username string, password
 }
 
 func (h *Handlers) GetID(ctx context.Context, arg *LoginAccountTxParams) string {
-	id, err := h.Queries.getAccountIDbyUsername(ctx, arg.Username)
+	id, err := h.Queries.GetAccountIDbyUsername(ctx, arg.Username)
 	if err != nil {
 		return ""
 	}

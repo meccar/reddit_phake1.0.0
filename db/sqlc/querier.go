@@ -12,6 +12,8 @@ import (
 
 type Querier interface {
 	CreateVerifyEmail(ctx context.Context, arg CreateVerifyEmailParams) (VerifyEmail, error)
+	GetAccountIDbyUsername(ctx context.Context, username string) (uuid.UUID, error)
+	GetAccountbyID(ctx context.Context, id uuid.UUID) ([]GetAccountbyIDRow, error)
 	GetAllPost(ctx context.Context) ([]Post, error)
 	GetCommunityIDbyName(ctx context.Context, communityName string) (uuid.UUID, error)
 	GetCommunitybyID(ctx context.Context, id uuid.UUID) ([]Community, error)
@@ -28,7 +30,6 @@ type Querier interface {
 	createSession(ctx context.Context, arg createSessionParams) (Session, error)
 	deleteSession(ctx context.Context, username string) error
 	getAccountIDbyID(ctx context.Context, id uuid.UUID) (uuid.UUID, error)
-	getAccountIDbyUsername(ctx context.Context, username string) (uuid.UUID, error)
 	getAccountRolebyUsername(ctx context.Context, username string) (string, error)
 	getAllSessionID(ctx context.Context) ([]uuid.UUID, error)
 	getFormsID(ctx context.Context, id uuid.UUID) (uuid.UUID, error)
