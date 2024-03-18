@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	util "util"
-
 	"github.com/google/uuid"
 )
 
@@ -29,10 +27,10 @@ func (h *Handlers) CreateCommunityTx(ctx context.Context, arg CreateCommunityTxP
 		// 	return err
 		// }
 
-		base64Encoded := util.GetImageBinary("https://tafviet.com/wp-content/uploads/2024/03/community-picture.jpg")
+		// base64Encoded := util.GetImageBinary("https://tafviet.com/wp-content/uploads/2024/03/community-picture.jpg")
 		// If the photo is empty, set it to the base64-encoded image data
 		if len(arg.Photo) == 0 {
-			arg.Photo = []byte(base64Encoded)
+			arg.Photo = []byte("https://tafviet.com/wp-content/uploads/2024/03/community-picture.jpg")
 		}
 
 		// // Submit the form to the database
