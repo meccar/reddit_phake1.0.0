@@ -12,9 +12,10 @@ import (
 	"github.com/google/uuid"
 )
 
+// Define a new struct to represent the combination of post and community details
 type postsResponse struct {
-	Post      []db.Post
-	Community []db.Community
+	Post      db.Post
+	Community []db.Community // Change the field type to slice of db.Community
 }
 
 func (server *Server) postHandler(c *gin.Context) {
@@ -24,34 +25,29 @@ func (server *Server) postHandler(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	fmt.Println("\n postHandler posts: ", posts)
 
-	// Collect community IDs from posts
-	var communityIDs []uuid.UUID
+	// Create a map to store post ID as keys and their associated communities as values
+	postCommunityMap := make(map[uuid.UUID][]db.Community)
+
+	// Retrieve community details for each post's community ID
 	for _, post := range posts {
-		communityIDs = append(communityIDs, post.CommunityID)
-	}
-	fmt.Println("\n postHandler communityIDs: ", communityIDs)
-
-	// Retrieve communities for each community ID
-	var communities []db.Community
-	for _, id := range communityIDs {
-		community, err := server.DbHandler.GetCommunitybyID(c.Request.Context(), id)
+		// Retrieve community details for the current post's community ID
+		community, err := server.DbHandler.GetCommunitybyID(c.Request.Context(), post.CommunityID)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
-		// Append each community individually
-		communities = append(communities, community...)
+		// Add the community details to the map
+		postCommunityMap[post.ID] = community
 	}
-	fmt.Println("\n postHandler communities: ", communities)
 
-	// Construct the response
-	response := postsResponse{
-		Post:      posts,
-		Community: communities,
+	// Construct the response by combining post and community details
+	var response []postsResponse
+	for _, post := range posts {
+		community := postCommunityMap[post.ID]
+		// Append post and associated community details to the response
+		response = append(response, postsResponse{Post: post, Community: community})
 	}
-	fmt.Println("\n postHandler response: ", response)
 
 	// Return the response to the client
 	c.JSON(http.StatusOK, response)

@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+
 	util "util"
 
 	"github.com/google/uuid"
@@ -23,7 +24,12 @@ func (h *Handlers) CreateCommunityTx(ctx context.Context, arg CreateCommunityTxP
 
 		ranID, err := uuid.NewRandom()
 
-		base64Encoded := util.GetImageBase64("https://tafviet.com/wp-content/uploads/2024/03/community-picture.jpg")
+		// resp, err := http.Get("https://tafviet.com/wp-content/uploads/2024/03/community-picture.jpg")
+		// if err != nil {
+		// 	return err
+		// }
+
+		base64Encoded := util.GetImageBinary("https://tafviet.com/wp-content/uploads/2024/03/community-picture.jpg")
 		// If the photo is empty, set it to the base64-encoded image data
 		if len(arg.Photo) == 0 {
 			arg.Photo = []byte(base64Encoded)

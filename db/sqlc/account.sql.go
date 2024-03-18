@@ -79,9 +79,10 @@ INSERT INTO Account (
   username,
   password,
   role,
+  photo,
   created_at
 ) VALUES (
-  $1,$2,$3,$4,CURRENT_TIMESTAMP
+  $1,$2,$3,$4,$5,CURRENT_TIMESTAMP
 ) RETURNING id, role, username, password, photo, is_email_verified, created_at
 `
 
@@ -90,6 +91,7 @@ type createAccountParams struct {
 	Username string    `json:"username"`
 	Password string    `json:"password"`
 	Role     string    `json:"role"`
+	Photo    []byte    `json:"photo"`
 }
 
 func (q *Queries) createAccount(ctx context.Context, arg createAccountParams) (Account, error) {
@@ -98,6 +100,7 @@ func (q *Queries) createAccount(ctx context.Context, arg createAccountParams) (A
 		arg.Username,
 		arg.Password,
 		arg.Role,
+		arg.Photo,
 	)
 	var i Account
 	err := row.Scan(
