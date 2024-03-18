@@ -31,10 +31,10 @@ type Comment struct {
 }
 
 type Community struct {
-	ID            uuid.UUID   `json:"id"`
-	CommunityName string      `json:"community_name"`
-	Photo         pgtype.Text `json:"photo"`
-	CreatedAt     time.Time   `json:"created_at"`
+	ID            uuid.UUID `json:"id"`
+	CommunityName string    `json:"community_name"`
+	Photo         []byte    `json:"photo"`
+	CreatedAt     time.Time `json:"created_at"`
 }
 
 type Form struct {

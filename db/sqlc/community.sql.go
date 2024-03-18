@@ -9,7 +9,6 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const getCommunityIDbyName = `-- name: GetCommunityIDbyName :one
@@ -97,9 +96,9 @@ INSERT INTO Community (
 `
 
 type createCommunityParams struct {
-	ID            uuid.UUID   `json:"id"`
-	CommunityName string      `json:"community_name"`
-	Photo         pgtype.Text `json:"photo"`
+	ID            uuid.UUID `json:"id"`
+	CommunityName string    `json:"community_name"`
+	Photo         []byte    `json:"photo"`
 }
 
 func (q *Queries) createCommunity(ctx context.Context, arg createCommunityParams) (Community, error) {
