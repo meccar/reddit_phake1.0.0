@@ -14,3 +14,7 @@ INSERT INTO Post (
 -- name: GetAllPost :many
 SELECT * FROM Post
 ORDER BY created_at DESC;
+
+-- name: GetPostbyID :one
+SELECT * FROM Post
+WHERE id = $1;

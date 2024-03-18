@@ -82,14 +82,6 @@ func (server *Server) CreatePost(c *gin.Context) {
 		return
 	}
 
-	// Parse the string value into a UUID
-	// msg.UserID, err = uuid.Parse(claim["ID"].(string))
-	// if err != nil {
-	// 	c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
-	// 	return
-	// }
-	// fmt.Println("\n CreatePost msg before GetCommunityIDbyName: ", msg)
-
 	msg.CommunityID, err = server.DbHandler.GetCommunityIDbyName(c, msg.CommunityName)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))

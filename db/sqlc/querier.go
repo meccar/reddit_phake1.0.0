@@ -17,6 +17,7 @@ type Querier interface {
 	GetAllPost(ctx context.Context) ([]Post, error)
 	GetCommunityIDbyName(ctx context.Context, communityName string) (uuid.UUID, error)
 	GetCommunitybyID(ctx context.Context, id uuid.UUID) ([]Community, error)
+	GetPostbyID(ctx context.Context, id uuid.UUID) (Post, error)
 	SearchCommunityName(ctx context.Context, communityName string) ([]SearchCommunityNameRow, error)
 	UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error)
 	UpdateVerifyEmail(ctx context.Context, arg UpdateVerifyEmailParams) (VerifyEmail, error)

@@ -47,3 +47,7 @@ func (h *Handlers) CreatePostTx(ctx context.Context, arg CreatePostTxParams) (Cr
 func (h *Handlers) GetAllPosts(ctx context.Context) ([]Post, error) {
 	return h.Queries.GetAllPost(ctx)
 }
+
+func (h *Handlers) GetPostbyID(ctx context.Context, id uuid.UUID) (Post, error) {
+	return h.Queries.GetPostbyID(ctx, id)
+}

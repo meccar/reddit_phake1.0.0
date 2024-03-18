@@ -45,6 +45,27 @@ func (q *Queries) GetAllPost(ctx context.Context) ([]Post, error) {
 	return items, nil
 }
 
+const getPostbyID = `-- name: GetPostbyID :one
+SELECT id, title, article, picture, user_id, community_id, upvotes, created_at FROM Post
+WHERE id = $1
+`
+
+func (q *Queries) GetPostbyID(ctx context.Context, id uuid.UUID) (Post, error) {
+	row := q.db.QueryRow(ctx, getPostbyID, id)
+	var i Post
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Article,
+		&i.Picture,
+		&i.UserID,
+		&i.CommunityID,
+		&i.Upvotes,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const createPost = `-- name: createPost :one
 INSERT INTO Post (
   id,
