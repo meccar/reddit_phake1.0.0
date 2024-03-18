@@ -98,7 +98,7 @@ INSERT INTO Community (
 type createCommunityParams struct {
 	ID            uuid.UUID `json:"id"`
 	CommunityName string    `json:"community_name"`
-	Photo         []byte    `json:"photo"`
+	Photo         string    `json:"photo"`
 }
 
 func (q *Queries) createCommunity(ctx context.Context, arg createCommunityParams) (Community, error) {

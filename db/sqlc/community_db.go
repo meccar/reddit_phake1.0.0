@@ -22,16 +22,11 @@ func (h *Handlers) CreateCommunityTx(ctx context.Context, arg CreateCommunityTxP
 
 		ranID, err := uuid.NewRandom()
 
-		// resp, err := http.Get("https://tafviet.com/wp-content/uploads/2024/03/community-picture.jpg")
-		// if err != nil {
-		// 	return err
-		// }
-
-		// base64Encoded := util.GetImageBinary("https://tafviet.com/wp-content/uploads/2024/03/community-picture.jpg")
 		// If the photo is empty, set it to the base64-encoded image data
 		if len(arg.Photo) == 0 {
-			arg.Photo = []byte("https://tafviet.com/wp-content/uploads/2024/03/community-picture.jpg")
+			arg.Photo = "https://tafviet.com/wp-content/uploads/2024/03/community-picture.jpg"
 		}
+		fmt.Println("CreateCommunityTx arg.Photo.String: ", arg.Photo)
 
 		// // Submit the form to the database
 		params := createCommunityParams{
@@ -39,6 +34,7 @@ func (h *Handlers) CreateCommunityTx(ctx context.Context, arg CreateCommunityTxP
 			CommunityName: arg.CommunityName,
 			Photo:         arg.Photo,
 		}
+		fmt.Println("CreateCommunityTx params: ", params)
 
 		Community, err := q.createCommunity(ctx, params)
 		fmt.Println("CreateCommunityTx: ", Community)

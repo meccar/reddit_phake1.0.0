@@ -60,7 +60,6 @@ func (h *Handlers) CreateAccountTx(ctx context.Context, arg CreateAccountTxParam
 
 		ranID, _ := uuid.NewRandom()
 
-		// base64Encoded := util.GetImageBinary("https://tafviet.com/wp-content/uploads/2024/03/profile-picture.jpg")
 		// If the photo is empty, set it to the base64-encoded image data
 		if len(arg.Photo) == 0 {
 			arg.Photo = []byte("https://tafviet.com/wp-content/uploads/2024/03/profile-picture.jpg")

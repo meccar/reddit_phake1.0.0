@@ -33,7 +33,7 @@ type Comment struct {
 type Community struct {
 	ID            uuid.UUID `json:"id"`
 	CommunityName string    `json:"community_name"`
-	Photo         []byte    `json:"photo"`
+	Photo         string    `json:"photo"`
 	CreatedAt     time.Time `json:"created_at"`
 }
 

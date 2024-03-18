@@ -64,7 +64,7 @@ CREATE TABLE Reply (
 CREATE TABLE Community (
   id uuid PRIMARY KEY,
   community_name varchar NOT NULL,
-  photo bytea,
+  photo varchar NOT NULL,
   -- photo varchar DEFAULT 'https://tafviet.com/wp-content/uploads/2024/03/community-picture.jpg',
   created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
