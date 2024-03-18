@@ -3,7 +3,7 @@ CREATE TABLE Account (
   role VARCHAR NOT NULL,
   username VARCHAR NOT NULL,
   password VARCHAR NOT NULL,
-  photo varchar DEFAULT 'https://tafviet.com/wp-content/uploads/2024/03/profile-picture.webp',
+  photo bytea,
   is_email_verified bool NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

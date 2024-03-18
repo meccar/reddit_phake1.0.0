@@ -2,10 +2,8 @@ package db
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
-	"io/ioutil"
-	"net/http"
+	util "util"
 
 	"github.com/google/uuid"
 )
@@ -25,26 +23,7 @@ func (h *Handlers) CreateCommunityTx(ctx context.Context, arg CreateCommunityTxP
 
 		ranID, err := uuid.NewRandom()
 
-		imagePath := "https://tafviet.com/wp-content/uploads/2024/03/community-picture.jpg"
-
-		// Make an HTTP GET request to fetch the image data
-		resp, err := http.Get(imagePath)
-		if err != nil {
-			fmt.Println("Error fetching image:", err)
-			return err
-		}
-		defer resp.Body.Close()
-
-		// Read the response body
-		imageBytes, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			fmt.Println("Error reading image data:", err)
-			return err
-		}
-
-		// Encode the image to base64
-		base64Encoded := base64.StdEncoding.EncodeToString(imageBytes)
-
+		base64Encoded := util.GetImageBase64("https://tafviet.com/wp-content/uploads/2024/03/community-picture.jpg")
 		// If the photo is empty, set it to the base64-encoded image data
 		if len(arg.Photo) == 0 {
 			arg.Photo = []byte(base64Encoded)
