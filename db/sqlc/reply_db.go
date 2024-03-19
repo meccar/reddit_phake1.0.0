@@ -42,3 +42,7 @@ func (h *Handlers) CreateReplyTx(ctx context.Context, arg CreateReplyTxParams) (
 	})
 	return result, err
 }
+
+func (h *Handlers) GetReplyFromComment(ctx context.Context, commentID uuid.UUID) ([]Reply, error) {
+	return h.Queries.GetReplyFromComment(ctx, commentID)
+}

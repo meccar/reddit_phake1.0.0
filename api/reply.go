@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (server *Server) replyHandler(c *gin.Context) {
+func (server *Server) CreateReply(c *gin.Context) {
 	// Parse the contact form data
 	msg, err := replyForm(c.Request)
 	if err != nil {

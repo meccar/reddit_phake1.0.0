@@ -15,6 +15,7 @@ import (
 type postsResponse struct {
 	Post      db.Post
 	Comment   []db.Comment
+	Reply     []db.Reply
 	Community []db.Community
 	Account   []db.GetAccountbyIDRow
 }
@@ -31,6 +32,7 @@ func (server *Server) postHandler(c *gin.Context) {
 	postCommunityMap := make(map[uuid.UUID][]db.Community)
 	postAccountMap := make(map[uuid.UUID][]db.GetAccountbyIDRow)
 	postCommentMap := make(map[uuid.UUID][]db.Comment)
+	postReplyMap := make(map[uuid.UUID][]db.Reply)
 
 	// Retrieve community details for each post's community ID
 	for _, post := range posts {
@@ -50,13 +52,21 @@ func (server *Server) postHandler(c *gin.Context) {
 
 		postAccountMap[post.ID] = account
 
-		comment, err := server.DbHandler.GetCommentFromPost(c.Request.Context(), post.ID)
+		comments, err := server.DbHandler.GetCommentFromPost(c.Request.Context(), post.ID)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
-		postCommentMap[post.ID] = comment
+		postCommentMap[post.ID] = comments
 
+		for _, comment := range comments {
+			reply, err := server.DbHandler.GetReplyFromComment(c.Request.Context(), comment.ID)
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
+				return
+			}
+			postReplyMap[comment.ID] = reply
+		}
 	}
 
 	// Construct the response by combining post and community details
@@ -64,10 +74,13 @@ func (server *Server) postHandler(c *gin.Context) {
 	for _, post := range posts {
 		community := postCommunityMap[post.ID]
 		account := postAccountMap[post.ID]
-		comment := postCommentMap[post.ID]
+		comments := postCommentMap[post.ID]
+		for _, comment := range comments {
+			reply := postReplyMap[comment.ID]
 
-		// Append post and associated community details to the response
-		response = append(response, postsResponse{Post: post, Comment: comment, Account: account, Community: community})
+			// Append post, associated community, comments, and replies to the response
+			response = append(response, postsResponse{Post: post, Comment: comments, Reply: reply, Account: account, Community: community})
+		}
 	}
 
 	// Return the response to the client

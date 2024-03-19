@@ -11,6 +11,39 @@ import (
 	"github.com/google/uuid"
 )
 
+const getReplyFromComment = `-- name: GetReplyFromComment :many
+SELECT id, comment_id, user_id, text, upvotes, created_at FROM Reply
+WHERE comment_id = $1
+ORDER BY created_at DESC
+`
+
+func (q *Queries) GetReplyFromComment(ctx context.Context, commentID uuid.UUID) ([]Reply, error) {
+	rows, err := q.db.Query(ctx, getReplyFromComment, commentID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Reply{}
+	for rows.Next() {
+		var i Reply
+		if err := rows.Scan(
+			&i.ID,
+			&i.CommentID,
+			&i.UserID,
+			&i.Text,
+			&i.Upvotes,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const createReply = `-- name: createReply :one
 INSERT INTO Reply (
   id,

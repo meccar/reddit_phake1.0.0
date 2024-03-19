@@ -66,7 +66,18 @@ CREATE TABLE Community (
   community_name varchar NOT NULL,
   photo varchar NOT NULL,
   -- photo varchar DEFAULT 'https://tafviet.com/wp-content/uploads/2024/03/community-picture.jpg',
+  description TEXT NOT NULL,
+  member VARCHAR NOT NULL,
+  online INT NOT NULL,
   created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Rule (
+    id uuid PRIMARY KEY,
+    community_id uuid NOT NULL,
+    title VARCHAR NOT NULL,
+    description TEXT NOT NULL
+    -- FOREIGN KEY (community_id) REFERENCES Community(id)
 );
 
 CREATE TABLE Verify_email (
