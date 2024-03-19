@@ -42,3 +42,7 @@ func (h *Handlers) CreateCommentTx(ctx context.Context, arg CreateCommentTxParam
 	})
 	return result, err
 }
+
+func (h *Handlers) GetCommentFromPost(ctx context.Context, postID uuid.UUID) ([]Comment, error) {
+	return h.Queries.GetCommentFromPost(ctx, postID)
+}

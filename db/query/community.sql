@@ -17,7 +17,7 @@ WHERE community_name like $1;
 SELECT id FROM Community
 WHERE community_name = $1;
 
--- name: GetCommunitybyID :many
+-- name: GetCommunitybyID :one
 SELECT * FROM Community
 WHERE id = $1;
 

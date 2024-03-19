@@ -23,37 +23,24 @@ func (q *Queries) GetCommunityIDbyName(ctx context.Context, communityName string
 	return id, err
 }
 
-const getCommunitybyID = `-- name: GetCommunitybyID :many
+const getCommunitybyID = `-- name: GetCommunitybyID :one
 SELECT id, community_name, photo, description, member, online, created_at FROM Community
 WHERE id = $1
 `
 
-func (q *Queries) GetCommunitybyID(ctx context.Context, id uuid.UUID) ([]Community, error) {
-	rows, err := q.db.Query(ctx, getCommunitybyID, id)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []Community{}
-	for rows.Next() {
-		var i Community
-		if err := rows.Scan(
-			&i.ID,
-			&i.CommunityName,
-			&i.Photo,
-			&i.Description,
-			&i.Member,
-			&i.Online,
-			&i.CreatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) GetCommunitybyID(ctx context.Context, id uuid.UUID) (Community, error) {
+	row := q.db.QueryRow(ctx, getCommunitybyID, id)
+	var i Community
+	err := row.Scan(
+		&i.ID,
+		&i.CommunityName,
+		&i.Photo,
+		&i.Description,
+		&i.Member,
+		&i.Online,
+		&i.CreatedAt,
+	)
+	return i, err
 }
 
 const searchCommunityName = `-- name: SearchCommunityName :many

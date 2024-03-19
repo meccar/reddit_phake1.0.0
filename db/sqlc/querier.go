@@ -17,7 +17,7 @@ type Querier interface {
 	GetAllPost(ctx context.Context) ([]Post, error)
 	GetCommentFromPost(ctx context.Context, postID uuid.UUID) ([]Comment, error)
 	GetCommunityIDbyName(ctx context.Context, communityName string) (uuid.UUID, error)
-	GetCommunitybyID(ctx context.Context, id uuid.UUID) ([]Community, error)
+	GetCommunitybyID(ctx context.Context, id uuid.UUID) (Community, error)
 	GetPostbyID(ctx context.Context, id uuid.UUID) (Post, error)
 	GetReplyFromComment(ctx context.Context, commentID uuid.UUID) ([]Reply, error)
 	GetRuleFromCommunity(ctx context.Context, communityID uuid.UUID) ([]Rule, error)

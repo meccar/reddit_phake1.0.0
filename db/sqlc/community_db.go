@@ -53,7 +53,7 @@ func (h *Handlers) SearchCommunity(ctx context.Context, communityName string) ([
 	return h.Queries.SearchCommunityName(ctx, communityName)
 }
 
-func (h *Handlers) GetCommunitybyID(ctx context.Context, id uuid.UUID) ([]Community, error) {
+func (h *Handlers) GetCommunitybyID(ctx context.Context, id uuid.UUID) (Community, error) {
 	return h.Queries.GetCommunitybyID(ctx, id)
 }
 
@@ -99,8 +99,4 @@ func (h *Handlers) GetCommunityIDbyName(ctx context.Context, communityName strin
 		return uuid.UUID{}, err
 	}
 	return id, nil
-}
-
-func (h *Handlers) GetCommentFromPost(ctx context.Context, postID uuid.UUID) ([]Comment, error) {
-	return h.Queries.GetCommentFromPost(ctx, postID)
 }
