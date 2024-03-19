@@ -14,6 +14,7 @@ import (
 // Define a new struct to represent the combination of post and community details
 type postsResponse struct {
 	Post      db.Post
+	Comment   []db.Comment
 	Community []db.Community
 	Account   []db.GetAccountbyIDRow
 }
@@ -29,6 +30,7 @@ func (server *Server) postHandler(c *gin.Context) {
 	// Create a map to store post ID as keys and their associated communities as values
 	postCommunityMap := make(map[uuid.UUID][]db.Community)
 	postAccountMap := make(map[uuid.UUID][]db.GetAccountbyIDRow)
+	postCommentMap := make(map[uuid.UUID][]db.Comment)
 
 	// Retrieve community details for each post's community ID
 	for _, post := range posts {
@@ -47,6 +49,14 @@ func (server *Server) postHandler(c *gin.Context) {
 		}
 
 		postAccountMap[post.ID] = account
+
+		comment, err := server.DbHandler.GetCommentFromPost(c.Request.Context(), post.ID)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+		postCommentMap[post.ID] = comment
+
 	}
 
 	// Construct the response by combining post and community details
@@ -54,9 +64,10 @@ func (server *Server) postHandler(c *gin.Context) {
 	for _, post := range posts {
 		community := postCommunityMap[post.ID]
 		account := postAccountMap[post.ID]
+		comment := postCommentMap[post.ID]
 
 		// Append post and associated community details to the response
-		response = append(response, postsResponse{Post: post, Account: account, Community: community})
+		response = append(response, postsResponse{Post: post, Comment: comment, Account: account, Community: community})
 	}
 
 	// Return the response to the client

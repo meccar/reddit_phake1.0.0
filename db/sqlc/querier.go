@@ -15,6 +15,7 @@ type Querier interface {
 	GetAccountIDbyUsername(ctx context.Context, username string) (uuid.UUID, error)
 	GetAccountbyID(ctx context.Context, id uuid.UUID) ([]GetAccountbyIDRow, error)
 	GetAllPost(ctx context.Context) ([]Post, error)
+	GetCommentFromPost(ctx context.Context, postID uuid.UUID) ([]Comment, error)
 	GetCommunityIDbyName(ctx context.Context, communityName string) (uuid.UUID, error)
 	GetCommunitybyID(ctx context.Context, id uuid.UUID) ([]Community, error)
 	GetPostbyID(ctx context.Context, id uuid.UUID) (Post, error)

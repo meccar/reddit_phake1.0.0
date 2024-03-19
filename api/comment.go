@@ -59,4 +59,5 @@ func commentForm(r *http.Request) (*db.CreateCommentTxParams, error) {
 }
 
 // func (server *Server) commentHandler(c *gin.Context) {
+// 	server.DbHandler.GetCommentFromPost(c.Request.Context())
 // }

@@ -11,6 +11,39 @@ import (
 	"github.com/google/uuid"
 )
 
+const getCommentFromPost = `-- name: GetCommentFromPost :many
+SELECT id, post_id, user_id, text, upvotes, created_at FROM Comment
+WHERE post_id = $1
+ORDER BY created_at DESC
+`
+
+func (q *Queries) GetCommentFromPost(ctx context.Context, postID uuid.UUID) ([]Comment, error) {
+	rows, err := q.db.Query(ctx, getCommentFromPost, postID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Comment{}
+	for rows.Next() {
+		var i Comment
+		if err := rows.Scan(
+			&i.ID,
+			&i.PostID,
+			&i.UserID,
+			&i.Text,
+			&i.Upvotes,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const createComment = `-- name: createComment :one
 INSERT INTO Comment (
   id,
