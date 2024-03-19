@@ -20,6 +20,7 @@ type Querier interface {
 	GetCommunitybyID(ctx context.Context, id uuid.UUID) ([]Community, error)
 	GetPostbyID(ctx context.Context, id uuid.UUID) (Post, error)
 	GetReplyFromComment(ctx context.Context, commentID uuid.UUID) ([]Reply, error)
+	GetRuleFromCommunity(ctx context.Context, communityID uuid.UUID) ([]Rule, error)
 	SearchCommunityName(ctx context.Context, communityName string) ([]SearchCommunityNameRow, error)
 	UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error)
 	UpdateVerifyEmail(ctx context.Context, arg UpdateVerifyEmailParams) (VerifyEmail, error)
@@ -30,6 +31,7 @@ type Querier interface {
 	createCommunity(ctx context.Context, arg createCommunityParams) (Community, error)
 	createPost(ctx context.Context, arg createPostParams) (Post, error)
 	createReply(ctx context.Context, arg createReplyParams) (Reply, error)
+	createRule(ctx context.Context, arg createRuleParams) (Rule, error)
 	createSession(ctx context.Context, arg createSessionParams) (Session, error)
 	deleteSession(ctx context.Context, username string) error
 	getAccountIDbyID(ctx context.Context, id uuid.UUID) (uuid.UUID, error)

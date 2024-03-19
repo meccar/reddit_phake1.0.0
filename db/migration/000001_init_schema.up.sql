@@ -77,7 +77,6 @@ CREATE TABLE Rule (
     community_id uuid NOT NULL,
     title VARCHAR NOT NULL,
     description TEXT NOT NULL
-    -- FOREIGN KEY (community_id) REFERENCES Community(id)
 );
 
 CREATE TABLE Verify_email (
@@ -100,3 +99,4 @@ ALTER TABLE Comment ADD FOREIGN KEY (post_id) REFERENCES Post (id);
 ALTER TABLE Comment ADD FOREIGN KEY (user_id) REFERENCES Account (id);
 ALTER TABLE Reply ADD FOREIGN KEY (comment_id) REFERENCES Comment (id);
 ALTER TABLE Reply ADD FOREIGN KEY (user_id) REFERENCES Account (id);
+ALTER TABLE Rule ADD FOREIGN KEY (community_id) REFERENCES Community (id);

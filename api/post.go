@@ -12,6 +12,7 @@ import (
 
 type postsResponse struct {
 	db.Post
+	Rule      []db.Rule
 	Comments  []db.Comment
 	Replies   []db.Reply
 	Community []db.Community
@@ -28,39 +29,48 @@ func (server *Server) postHandler(c *gin.Context) {
 	// Retrieve community and account details for each post
 	var response []postsResponse
 	for _, post := range posts {
-		community, err := server.DbHandler.GetCommunitybyID(c.Request.Context(), post.CommunityID)
+		communities, err := server.DbHandler.GetCommunitybyID(c.Request.Context(), post.CommunityID)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
-		account, err := server.DbHandler.GetAccountbyID(c.Request.Context(), post.UserID)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
-			return
-		}
-
-		// Retrieve comments and replies for the current post
-		comments, err := server.DbHandler.GetCommentFromPost(c.Request.Context(), post.ID)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
-			return
-		}
-
-		for _, comment := range comments {
-			replies, err := server.DbHandler.GetReplyFromComment(c.Request.Context(), comment.ID)
+		for _, community := range communities {
+			rule, err := server.DbHandler.GetRuleFromCommunity(c.Request.Context(), community.ID)
 			if err != nil {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 				return
 			}
 
-			// Append post, comments, replies, community, and account to the response
-			response = append(response, postsResponse{
-				Post:      post,
-				Comments:  comments,
-				Replies:   replies,
-				Community: community,
-				Account:   account,
-			})
+			account, err := server.DbHandler.GetAccountbyID(c.Request.Context(), post.UserID)
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
+				return
+			}
+
+			// Retrieve comments and replies for the current post
+			comments, err := server.DbHandler.GetCommentFromPost(c.Request.Context(), post.ID)
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
+				return
+			}
+
+			for _, comment := range comments {
+				replies, err := server.DbHandler.GetReplyFromComment(c.Request.Context(), comment.ID)
+				if err != nil {
+					c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
+					return
+				}
+
+				// Append post, comments, replies, community, and account to the response
+				response = append(response, postsResponse{
+					Post:      post,
+					Comments:  comments,
+					Replies:   replies,
+					Community: communities,
+					Rule:      rule,
+					Account:   account,
+				})
+			}
 		}
 	}
 

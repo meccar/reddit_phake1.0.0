@@ -34,6 +34,9 @@ type Community struct {
 	ID            uuid.UUID `json:"id"`
 	CommunityName string    `json:"community_name"`
 	Photo         string    `json:"photo"`
+	Description   string    `json:"description"`
+	Member        string    `json:"member"`
+	Online        int32     `json:"online"`
 	CreatedAt     time.Time `json:"created_at"`
 }
 
@@ -63,6 +66,13 @@ type Reply struct {
 	Text      string    `json:"text"`
 	Upvotes   int32     `json:"upvotes"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+type Rule struct {
+	ID          uuid.UUID `json:"id"`
+	CommunityID uuid.UUID `json:"community_id"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
 }
 
 type Session struct {

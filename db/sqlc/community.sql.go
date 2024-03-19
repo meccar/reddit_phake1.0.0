@@ -24,7 +24,7 @@ func (q *Queries) GetCommunityIDbyName(ctx context.Context, communityName string
 }
 
 const getCommunitybyID = `-- name: GetCommunitybyID :many
-SELECT id, community_name, photo, created_at FROM Community
+SELECT id, community_name, photo, description, member, online, created_at FROM Community
 WHERE id = $1
 `
 
@@ -41,6 +41,9 @@ func (q *Queries) GetCommunitybyID(ctx context.Context, id uuid.UUID) ([]Communi
 			&i.ID,
 			&i.CommunityName,
 			&i.Photo,
+			&i.Description,
+			&i.Member,
+			&i.Online,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -92,7 +95,7 @@ INSERT INTO Community (
   created_at
 ) VALUES (
   $1,$2,$3,CURRENT_TIMESTAMP
-) RETURNING id, community_name, photo, created_at
+) RETURNING id, community_name, photo, description, member, online, created_at
 `
 
 type createCommunityParams struct {
@@ -108,6 +111,9 @@ func (q *Queries) createCommunity(ctx context.Context, arg createCommunityParams
 		&i.ID,
 		&i.CommunityName,
 		&i.Photo,
+		&i.Description,
+		&i.Member,
+		&i.Online,
 		&i.CreatedAt,
 	)
 	return i, err
