@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"net/http"
 
 	db "sqlc"
@@ -12,78 +13,69 @@ import (
 )
 
 // Define a new struct to represent the combination of post and community details
+type commenter interface {
+	GetCommentsFromPost(context.Context, uuid.UUID) ([]db.Comment, error)
+	GetRepliesFromComment(context.Context, uuid.UUID) ([]db.Reply, error)
+}
+
 type postsResponse struct {
-	Post      db.Post
-	Comment   []db.Comment
-	Reply     []db.Reply
+	db.Post
+	Comments  []db.Comment
+	Replies   []db.Reply
 	Community []db.Community
 	Account   []db.GetAccountbyIDRow
 }
 
 func (server *Server) postHandler(c *gin.Context) {
-	// Retrieve posts from the database
 	posts, err := server.DbHandler.GetAllPosts(c.Request.Context())
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	// Create a map to store post ID as keys and their associated communities as values
-	postCommunityMap := make(map[uuid.UUID][]db.Community)
-	postAccountMap := make(map[uuid.UUID][]db.GetAccountbyIDRow)
-	postCommentMap := make(map[uuid.UUID][]db.Comment)
-	postReplyMap := make(map[uuid.UUID][]db.Reply)
+	// Retrieve community and account details for all posts
+	// communities := make(map[uuid.UUID][]db.Community)
+	// accounts := make(map[uuid.UUID][]db.GetAccountbyIDRow)
 
-	// Retrieve community details for each post's community ID
+	// Retrieve community and account details for each post
+	var response []postsResponse
 	for _, post := range posts {
-		// Retrieve community details for the current post's community ID
 		community, err := server.DbHandler.GetCommunitybyID(c.Request.Context(), post.CommunityID)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
-		postCommunityMap[post.ID] = community
-
 		account, err := server.DbHandler.GetAccountbyID(c.Request.Context(), post.UserID)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
 
-		postAccountMap[post.ID] = account
-
+		// Retrieve comments and replies for the current post
 		comments, err := server.DbHandler.GetCommentFromPost(c.Request.Context(), post.ID)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
-		postCommentMap[post.ID] = comments
 
 		for _, comment := range comments {
-			reply, err := server.DbHandler.GetReplyFromComment(c.Request.Context(), comment.ID)
+			replies, err := server.DbHandler.GetReplyFromComment(c.Request.Context(), comment.ID)
 			if err != nil {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 				return
 			}
-			postReplyMap[comment.ID] = reply
+
+			// Append post, comments, replies, community, and account to the response
+			response = append(response, postsResponse{
+				Post:      post,
+				Comments:  comments,
+				Replies:   replies,
+				Community: community,
+				Account:   account,
+			})
 		}
 	}
 
-	// Construct the response by combining post and community details
-	var response []postsResponse
-	for _, post := range posts {
-		community := postCommunityMap[post.ID]
-		account := postAccountMap[post.ID]
-		comments := postCommentMap[post.ID]
-		for _, comment := range comments {
-			reply := postReplyMap[comment.ID]
-
-			// Append post, associated community, comments, and replies to the response
-			response = append(response, postsResponse{Post: post, Comment: comments, Reply: reply, Account: account, Community: community})
-		}
-	}
-
-	// Return the response to the client
 	c.JSON(http.StatusOK, response)
 }
 
