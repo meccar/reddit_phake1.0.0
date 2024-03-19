@@ -12,11 +12,15 @@ import (
 
 type postsResponse struct {
 	db.Post
-	Rule      []db.Rule
-	Comments  []db.Comment
-	Replies   []db.Reply
-	Community []db.Community
-	Account   []db.GetAccountbyIDRow
+	Community struct {
+		db.Community
+		Rule []db.Rule
+	}
+	Comments struct {
+		db.Comment
+		Replies []db.Reply
+	}
+	Account []db.GetAccountbyIDRow
 }
 
 func (server *Server) postHandler(c *gin.Context) {
@@ -26,7 +30,6 @@ func (server *Server) postHandler(c *gin.Context) {
 		return
 	}
 
-	// Retrieve community and account details for each post
 	var response []postsResponse
 	for _, post := range posts {
 		communities, err := server.DbHandler.GetCommunitybyID(c.Request.Context(), post.CommunityID)
@@ -63,12 +66,16 @@ func (server *Server) postHandler(c *gin.Context) {
 
 				// Append post, comments, replies, community, and account to the response
 				response = append(response, postsResponse{
-					Post:      post,
-					Comments:  comments,
-					Replies:   replies,
-					Community: communities,
-					Rule:      rule,
-					Account:   account,
+					Post:    post,
+					Account: account,
+					Community: struct {
+						db.Community
+						Rule []db.Rule
+					}{Community: community, Rule: rule},
+					Comments: struct {
+						db.Comment
+						Replies []db.Reply
+					}{Comment: comment, Replies: replies},
 				})
 			}
 		}
