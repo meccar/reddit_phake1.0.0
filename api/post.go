@@ -9,14 +9,7 @@ import (
 	util "util"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
-
-// Define a new struct to represent the combination of post and community details
-type commenter interface {
-	GetCommentsFromPost(context.Context, uuid.UUID) ([]db.Comment, error)
-	GetRepliesFromComment(context.Context, uuid.UUID) ([]db.Reply, error)
-}
 
 type postsResponse struct {
 	db.Post
@@ -32,10 +25,6 @@ func (server *Server) postHandler(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-
-	// Retrieve community and account details for all posts
-	// communities := make(map[uuid.UUID][]db.Community)
-	// accounts := make(map[uuid.UUID][]db.GetAccountbyIDRow)
 
 	// Retrieve community and account details for each post
 	var response []postsResponse
