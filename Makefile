@@ -8,9 +8,9 @@ config:
 	sudo tar -C /usr/local/ -xzf go1.22.0.linux-amd64.tar.gz
 
 docker:
-	docker stop $(docker ps -q | tail -n 1)
-	docker rm $(docker ps -q | tail -n 1)
-	docker start $(docker ps -q | head -n 1)
+	docker stop $$(docker ps -q | tail -n 1); \
+	docker remove $$(docker ps -q | tail -n 1); \
+	docker start $$(docker ps -q | head -n 1)
 
 network:
 	docker network create reddit-network
