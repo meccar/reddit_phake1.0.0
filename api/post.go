@@ -16,11 +16,13 @@ type postsResponse struct {
 		db.Community
 		Rule []db.Rule
 	}
-	Comments struct {
-		db.Comment
-		Replies []db.Reply
-	}
-	Account []db.GetAccountbyIDRow
+	Comments []CommentWithReplies
+	Account  []db.GetAccountbyIDRow
+}
+
+type CommentWithReplies struct {
+	db.Comment
+	Replies []db.Reply
 }
 
 func (server *Server) postHandler(c *gin.Context) {
@@ -32,52 +34,60 @@ func (server *Server) postHandler(c *gin.Context) {
 
 	var response []postsResponse
 	for _, post := range posts {
+		// Retrieve community details for the post
 		community, err := server.DbHandler.GetCommunitybyID(c.Request.Context(), post.CommunityID)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
+
+		// Retrieve rules for the community
 		rule, err := server.DbHandler.GetRuleFromCommunity(c.Request.Context(), community.ID)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
 
+		// Retrieve account details for the post user
 		account, err := server.DbHandler.GetAccountbyID(c.Request.Context(), post.UserID)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
 
-		// Retrieve comments and replies for the current post
+		// Retrieve comments for the post
 		comments, err := server.DbHandler.GetCommentFromPost(c.Request.Context(), post.ID)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
 
+		// Group comments and their replies together
+		var commentDetails []CommentWithReplies
 		for _, comment := range comments {
 			replies, err := server.DbHandler.GetReplyFromComment(c.Request.Context(), comment.ID)
 			if err != nil {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 				return
 			}
-
-			// Append post, comments, replies, community, and account to the response
-			response = append(response, postsResponse{
-				Post:    post,
-				Account: account,
-				Community: struct {
-					db.Community
-					Rule []db.Rule
-				}{Community: community, Rule: rule},
-				Comments: struct {
-					db.Comment
-					Replies []db.Reply
-				}{Comment: comment, Replies: replies},
+			commentDetails = append(commentDetails, CommentWithReplies{
+				Comment: comment,
+				Replies: replies,
 			})
 		}
+
+		// Append post details to the response
+		response = append(response, postsResponse{
+			Post: post,
+			Community: struct {
+				db.Community
+				Rule []db.Rule
+			}{Community: community, Rule: rule},
+			Comments: commentDetails,
+			Account:  account,
+		})
 	}
+
 	c.JSON(http.StatusOK, response)
 }
 
