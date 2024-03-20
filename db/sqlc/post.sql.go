@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -18,6 +19,76 @@ ORDER BY created_at DESC
 
 func (q *Queries) GetAllPost(ctx context.Context) ([]Post, error) {
 	rows, err := q.db.Query(ctx, getAllPost)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Post{}
+	for rows.Next() {
+		var i Post
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Article,
+			&i.Picture,
+			&i.UserID,
+			&i.CommunityID,
+			&i.Upvotes,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getPostByCommunity = `-- name: GetPostByCommunity :many
+SELECT id, title, article, picture, user_id, community_id, upvotes, created_at FROM Post
+WHERE community_id = $1
+ORDER BY created_at DESC
+`
+
+func (q *Queries) GetPostByCommunity(ctx context.Context, communityID uuid.UUID) ([]Post, error) {
+	rows, err := q.db.Query(ctx, getPostByCommunity, communityID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Post{}
+	for rows.Next() {
+		var i Post
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Article,
+			&i.Picture,
+			&i.UserID,
+			&i.CommunityID,
+			&i.Upvotes,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getPostByUser = `-- name: GetPostByUser :many
+SELECT id, title, article, picture, user_id, community_id, upvotes, created_at FROM Post
+WHERE user_id = $1
+ORDER BY created_at DESC
+`
+
+func (q *Queries) GetPostByUser(ctx context.Context, userID uuid.UUID) ([]Post, error) {
+	rows, err := q.db.Query(ctx, getPostByUser, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -64,6 +135,176 @@ func (q *Queries) GetPostbyID(ctx context.Context, id uuid.UUID) (Post, error) {
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const sortPostByDay = `-- name: SortPostByDay :many
+SELECT id, title, article, picture, user_id, community_id, upvotes, created_at FROM Post
+WHERE DATE_PART('day', created_at) = $1
+`
+
+func (q *Queries) SortPostByDay(ctx context.Context, createdAt time.Time) ([]Post, error) {
+	rows, err := q.db.Query(ctx, sortPostByDay, createdAt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Post{}
+	for rows.Next() {
+		var i Post
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Article,
+			&i.Picture,
+			&i.UserID,
+			&i.CommunityID,
+			&i.Upvotes,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const sortPostByMonth = `-- name: SortPostByMonth :many
+SELECT id, title, article, picture, user_id, community_id, upvotes, created_at FROM Post
+WHERE DATE_PART('month', created_at) = $1
+`
+
+func (q *Queries) SortPostByMonth(ctx context.Context, createdAt time.Time) ([]Post, error) {
+	rows, err := q.db.Query(ctx, sortPostByMonth, createdAt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Post{}
+	for rows.Next() {
+		var i Post
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Article,
+			&i.Picture,
+			&i.UserID,
+			&i.CommunityID,
+			&i.Upvotes,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const sortPostByUpvotesASC = `-- name: SortPostByUpvotesASC :many
+SELECT id, title, article, picture, user_id, community_id, upvotes, created_at FROM Post
+ORDER BY upvotes ASC
+`
+
+func (q *Queries) SortPostByUpvotesASC(ctx context.Context) ([]Post, error) {
+	rows, err := q.db.Query(ctx, sortPostByUpvotesASC)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Post{}
+	for rows.Next() {
+		var i Post
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Article,
+			&i.Picture,
+			&i.UserID,
+			&i.CommunityID,
+			&i.Upvotes,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const sortPostByUpvotesDESC = `-- name: SortPostByUpvotesDESC :many
+SELECT id, title, article, picture, user_id, community_id, upvotes, created_at FROM Post
+ORDER BY upvotes DESC
+`
+
+func (q *Queries) SortPostByUpvotesDESC(ctx context.Context) ([]Post, error) {
+	rows, err := q.db.Query(ctx, sortPostByUpvotesDESC)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Post{}
+	for rows.Next() {
+		var i Post
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Article,
+			&i.Picture,
+			&i.UserID,
+			&i.CommunityID,
+			&i.Upvotes,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const sortPostByYear = `-- name: SortPostByYear :many
+SELECT id, title, article, picture, user_id, community_id, upvotes, created_at FROM Post
+WHERE DATE_PART('year', created_at) = $1
+`
+
+func (q *Queries) SortPostByYear(ctx context.Context, createdAt time.Time) ([]Post, error) {
+	rows, err := q.db.Query(ctx, sortPostByYear, createdAt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Post{}
+	for rows.Next() {
+		var i Post
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Article,
+			&i.Picture,
+			&i.UserID,
+			&i.CommunityID,
+			&i.Upvotes,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const createPost = `-- name: createPost :one

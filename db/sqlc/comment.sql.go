@@ -11,6 +11,39 @@ import (
 	"github.com/google/uuid"
 )
 
+const filterPostHavingMostComments = `-- name: FilterPostHavingMostComments :many
+SELECT post_id, COUNT(*) AS comment_count
+FROM Comment
+GROUP BY post_id
+ORDER BY comment_count DESC
+LIMIT 1
+`
+
+type FilterPostHavingMostCommentsRow struct {
+	PostID       uuid.UUID `json:"post_id"`
+	CommentCount int64     `json:"comment_count"`
+}
+
+func (q *Queries) FilterPostHavingMostComments(ctx context.Context) ([]FilterPostHavingMostCommentsRow, error) {
+	rows, err := q.db.Query(ctx, filterPostHavingMostComments)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []FilterPostHavingMostCommentsRow{}
+	for rows.Next() {
+		var i FilterPostHavingMostCommentsRow
+		if err := rows.Scan(&i.PostID, &i.CommentCount); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getCommentFromPost = `-- name: GetCommentFromPost :many
 SELECT id, post_id, user_id, text, upvotes, created_at FROM Comment
 WHERE post_id = $1
@@ -19,6 +52,135 @@ ORDER BY created_at DESC
 
 func (q *Queries) GetCommentFromPost(ctx context.Context, postID uuid.UUID) ([]Comment, error) {
 	rows, err := q.db.Query(ctx, getCommentFromPost, postID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Comment{}
+	for rows.Next() {
+		var i Comment
+		if err := rows.Scan(
+			&i.ID,
+			&i.PostID,
+			&i.UserID,
+			&i.Text,
+			&i.Upvotes,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getCommentFromUser = `-- name: GetCommentFromUser :many
+SELECT id, post_id, user_id, text, upvotes, created_at FROM Comment
+WHERE user_id = $1
+ORDER BY created_at DESC
+`
+
+func (q *Queries) GetCommentFromUser(ctx context.Context, userID uuid.UUID) ([]Comment, error) {
+	rows, err := q.db.Query(ctx, getCommentFromUser, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Comment{}
+	for rows.Next() {
+		var i Comment
+		if err := rows.Scan(
+			&i.ID,
+			&i.PostID,
+			&i.UserID,
+			&i.Text,
+			&i.Upvotes,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const sortCommentASC = `-- name: SortCommentASC :many
+SELECT id, post_id, user_id, text, upvotes, created_at FROM Comment
+ORDER BY created_at ASC
+`
+
+func (q *Queries) SortCommentASC(ctx context.Context) ([]Comment, error) {
+	rows, err := q.db.Query(ctx, sortCommentASC)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Comment{}
+	for rows.Next() {
+		var i Comment
+		if err := rows.Scan(
+			&i.ID,
+			&i.PostID,
+			&i.UserID,
+			&i.Text,
+			&i.Upvotes,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const sortCommentByUpvotes = `-- name: SortCommentByUpvotes :many
+SELECT id, post_id, user_id, text, upvotes, created_at FROM Comment
+ORDER BY upvotes DESC
+`
+
+func (q *Queries) SortCommentByUpvotes(ctx context.Context) ([]Comment, error) {
+	rows, err := q.db.Query(ctx, sortCommentByUpvotes)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Comment{}
+	for rows.Next() {
+		var i Comment
+		if err := rows.Scan(
+			&i.ID,
+			&i.PostID,
+			&i.UserID,
+			&i.Text,
+			&i.Upvotes,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const sortCommentDESC = `-- name: SortCommentDESC :many
+SELECT id, post_id, user_id, text, upvotes, created_at FROM Comment
+ORDER BY created_at DESC
+`
+
+func (q *Queries) SortCommentDESC(ctx context.Context) ([]Comment, error) {
+	rows, err := q.db.Query(ctx, sortCommentDESC)
 	if err != nil {
 		return nil, err
 	}

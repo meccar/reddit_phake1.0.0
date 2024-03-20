@@ -6,22 +6,35 @@ package db
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
 
 type Querier interface {
 	CreateVerifyEmail(ctx context.Context, arg CreateVerifyEmailParams) (VerifyEmail, error)
+	FilterPostHavingMostComments(ctx context.Context) ([]FilterPostHavingMostCommentsRow, error)
 	GetAccountIDbyUsername(ctx context.Context, username string) (uuid.UUID, error)
 	GetAccountbyID(ctx context.Context, id uuid.UUID) ([]GetAccountbyIDRow, error)
 	GetAllPost(ctx context.Context) ([]Post, error)
 	GetCommentFromPost(ctx context.Context, postID uuid.UUID) ([]Comment, error)
+	GetCommentFromUser(ctx context.Context, userID uuid.UUID) ([]Comment, error)
 	GetCommunityIDbyName(ctx context.Context, communityName string) (uuid.UUID, error)
 	GetCommunitybyID(ctx context.Context, id uuid.UUID) (Community, error)
+	GetPostByCommunity(ctx context.Context, communityID uuid.UUID) ([]Post, error)
+	GetPostByUser(ctx context.Context, userID uuid.UUID) ([]Post, error)
 	GetPostbyID(ctx context.Context, id uuid.UUID) (Post, error)
 	GetReplyFromComment(ctx context.Context, commentID uuid.UUID) ([]Reply, error)
 	GetRuleFromCommunity(ctx context.Context, communityID uuid.UUID) ([]Rule, error)
 	SearchCommunityName(ctx context.Context, communityName string) ([]SearchCommunityNameRow, error)
+	SortCommentASC(ctx context.Context) ([]Comment, error)
+	SortCommentByUpvotes(ctx context.Context) ([]Comment, error)
+	SortCommentDESC(ctx context.Context) ([]Comment, error)
+	SortPostByDay(ctx context.Context, createdAt time.Time) ([]Post, error)
+	SortPostByMonth(ctx context.Context, createdAt time.Time) ([]Post, error)
+	SortPostByUpvotesASC(ctx context.Context) ([]Post, error)
+	SortPostByUpvotesDESC(ctx context.Context) ([]Post, error)
+	SortPostByYear(ctx context.Context, createdAt time.Time) ([]Post, error)
 	UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error)
 	UpdateVerifyEmail(ctx context.Context, arg UpdateVerifyEmailParams) (VerifyEmail, error)
 	authPassword(ctx context.Context, username string) (string, error)
