@@ -16,19 +16,19 @@ dropdb:
 	docker exec -it postgres dropdb -U postgres reddit
 
 migrateup:
-	migrate -path db/migration -database "$(DB_URL)" -verbose up
+	migrate -path reddit_backend/db/migration -database "$(DB_URL)" -verbose up
 
 migrateup1:
-	migrate -path db/migration -database "$(DB_URL)" -verbose up 1
+	migrate -path reddit_backend/db/migration -database "$(DB_URL)" -verbose up 1
 
 migratedown:
-	migrate -path db/migration -database "$(DB_URL)" -verbose down
+	migrate -path reddit_backend/db/migration -database "$(DB_URL)" -verbose down
 
 migratedown1:
-	migrate -path db/migration -database "$(DB_URL)" -verbose down 1
+	migrate -path reddit_backend/db/migration -database "$(DB_URL)" -verbose down 1
 
 new_migration:
-	migrate create -ext sql -dir db/migration -seq $(name)
+	migrate create -ext sql -dir reddit_backend/db/migration -seq $(name)
 
 db_docs:
 	dbdocs build doc/db.dbml
@@ -43,7 +43,7 @@ test:
 	go test -v -cover -short ./...
 
 server:
-	go run main.go
+	go run reddit_backend/main.go
 
 proto:
 	rm -f pb/*.go
