@@ -10,7 +10,6 @@ config:
 docker:
 	docker stop $$(docker ps -q | tail -n 1); \
 	docker rm $$(docker ps -a --filter "status=exited" --format "{{.ID}}"); \
-	make docker &; \
 	docker start $$(docker ps -a --format "{{.ID}}" | head -n 1)
 
 network:
