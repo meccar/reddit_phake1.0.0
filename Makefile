@@ -9,7 +9,7 @@ config:
 
 docker:
 	docker stop $(docker ps -q | tail -n 1)
-	docker remove $(docker ps -q | tail -n 1)
+	docker rm $(docker ps -q | tail -n 1)
 	docker start $(docker ps -q | head -n 1)
 
 network:
