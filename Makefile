@@ -5,7 +5,6 @@ config:
 	sudo apt-get update
 	sudo apt-get install -y migrate
 	sudo rm -rf /usr/local/go
-	sudo rm /etc/paths.d/go
 	sudo tar -C /usr/local/ -xzf go1.22.0.linux-amd64.tar.gz
 
 docker:
