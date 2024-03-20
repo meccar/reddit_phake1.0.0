@@ -40,7 +40,7 @@ sqlc:
 	sqlc generate
 
 test:
-	go test -v -cover -short ./...
+	go test -v -cover -short ./reddit_backend/...
 
 server:
 	go run reddit_backend/main.go
