@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -50,4 +51,24 @@ func (h *Handlers) GetAllPosts(ctx context.Context) ([]Post, error) {
 
 func (h *Handlers) GetPostbyID(ctx context.Context, id uuid.UUID) (Post, error) {
 	return h.Queries.GetPostbyID(ctx, id)
+}
+
+func (h *Handlers) SortPostByYear(ctx context.Context, createdAt time.Time) ([]Post, error) {
+	return h.Queries.SortPostByYear(ctx, createdAt)
+}
+
+func (h *Handlers) SortPostByMonth(ctx context.Context, createdAt time.Time) ([]Post, error) {
+	return h.Queries.SortPostByMonth(ctx, createdAt)
+}
+
+func (h *Handlers) SortPostByDay(ctx context.Context, createdAt time.Time) ([]Post, error) {
+	return h.Queries.SortPostByDay(ctx, createdAt)
+}
+
+func (h *Handlers) SortPostByUpvotesASC(ctx context.Context) ([]Post, error) {
+	return h.Queries.SortPostByUpvotesASC(ctx)
+}
+
+func (h *Handlers) SortPostByUpvotesDESC(ctx context.Context) ([]Post, error) {
+	return h.Queries.SortPostByUpvotesDESC(ctx)
 }
