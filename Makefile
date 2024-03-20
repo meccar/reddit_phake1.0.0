@@ -1,5 +1,18 @@
 DB_URL=postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable
 
+config:
+	curl -s https://packagecloud.io/install/repositories/golang-migrate/migrate/script.deb.sh | sudo bash
+	sudo apt-get update
+	sudo apt-get install -y migrate
+	sudo rm -rf /usr/local/go
+	sudo rm /etc/paths.d/go
+	sudo tar -C /usr/local/ -xzf go1.22.0.linux-amd64.tar.gz
+
+docker:
+	docker stop $(docker ps -q | tail -n 1)
+	docker remove $(docker ps -q | tail -n 1)
+	docker start $(docker ps -q | head -n 1)
+
 network:
 	docker network create reddit-network
 
