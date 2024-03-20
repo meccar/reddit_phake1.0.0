@@ -12,9 +12,9 @@ how to run?
   sudo apt-get install -y migrate
   
 
-2- Run "make postgres" in terminal
+2- Run "make network" in terminal
 
-3- Run "make network" in terminal
+3- Run "make postgres" in terminal
 
 4- Run "docker ps -a" in terminal
    Copy "PORTS" of "postgres:16.2" 
