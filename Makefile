@@ -28,7 +28,7 @@ mysql:
 
 createdb:
 	docker exec -it postgres createdb --username=postgres reddit || \
-	(sleep 5 && docker exec -it postgres createdb --username=postgres reddit)
+	(sleep 10 && docker exec -it postgres createdb --username=postgres reddit)
 
 dropdb:
 	docker exec -it postgres dropdb -U postgres reddit
