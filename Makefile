@@ -6,6 +6,10 @@ config:
 	sudo apt-get install -y migrate
 	sudo rm -rf /usr/local/go
 	sudo tar -C /usr/local/ -xzf go1.22.0.linux-amd64.tar.gz
+	make network
+	make docker
+	make createdb
+	make migrateup
 
 docker:
 	docker stop $$(docker ps -q | tail -n 1); \
@@ -23,7 +27,8 @@ mysql:
 	docker run --name mysql8 -p 3306:3306  -e MYSQL_ROOT_PASSWORD=postgres -d mysql:8
 
 createdb:
-	docker exec -it postgres createdb --username=postgres reddit
+	docker exec -it postgres createdb --username=postgres reddit || \
+	(sleep 10 && docker exec -it postgres createdb --username=postgres reddit)
 
 dropdb:
 	docker exec -it postgres dropdb -U postgres reddit
