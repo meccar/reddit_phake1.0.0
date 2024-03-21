@@ -6,6 +6,10 @@ config:
 	sudo apt-get install -y migrate
 	sudo rm -rf /usr/local/go
 	sudo tar -C /usr/local/ -xzf go1.22.0.linux-amd64.tar.gz
+	make network
+	make docker
+	make createdb
+	make migrateup
 
 docker:
 	docker stop $$(docker ps -q | tail -n 1); \
