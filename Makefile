@@ -1,5 +1,9 @@
 DB_URL=postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable
 
+npm:
+	sudo apt-get install npm
+	sudo npm -g install create-react-app
+
 config:
 	curl -s https://packagecloud.io/install/repositories/golang-migrate/migrate/script.deb.sh | sudo bash
 	sudo apt-get update

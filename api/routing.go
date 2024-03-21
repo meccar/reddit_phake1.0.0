@@ -10,7 +10,7 @@ import (
 
 func (server *Server) SetupRoutes() {
 	// Load HTML templates
-	server.Router.LoadHTMLGlob("./templates/*.html")
+	server.Router.LoadHTMLGlob("./app/templates/*.html")
 
 	// Serve static files
 	server.Router.Static("/public", "./public")
