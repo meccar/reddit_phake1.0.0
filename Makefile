@@ -27,7 +27,8 @@ mysql:
 	docker run --name mysql8 -p 3306:3306  -e MYSQL_ROOT_PASSWORD=postgres -d mysql:8
 
 createdb:
-	docker exec -it postgres createdb --username=postgres reddit
+	docker exec -it postgres createdb --username=postgres reddit || \
+	(sleep 5 && docker exec -it postgres createdb --username=postgres reddit)
 
 dropdb:
 	docker exec -it postgres dropdb -U postgres reddit
